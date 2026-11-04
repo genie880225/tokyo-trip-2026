@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#e8dfd1" />
+  <title>宅宅之旅｜東京 7 天 6 夜</title>
+<style>
+    :root {
+      --wood: #a7835c;
+      --wood-dark: #71563d;
+      --sand: #e8dfd1;
+      --cream: #f7f4ee;
+      --paper: #fffdf8;
+      --ink: #38352f;
+      --muted: #81796d;
+      --sage: #8b9782;
+      --sage-light: #e8ece3;
+      --line: #e7dfd2;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--cream);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+      line-height: 1.75;
+      letter-spacing: .015em;
+    }
+    a { color: var(--wood-dark); text-decoration: none; font-weight: 600; }
+    a:hover { text-decoration: underline; }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 58px 20px 48px;
+      text-align: center;
+      color: var(--ink);
+      background: linear-gradient(135deg, #e8dfd1 0%, #f2ede4 55%, #dce2d5 100%);
+      border-bottom: 1px solid #d8cebf;
+    }
+    .hero:before, .hero:after {
+      position: absolute;
+      content: "";
+      width: 170px;
+      height: 170px;
+      border: 1px solid #ffffff8a;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    .hero:before { top: -95px; left: -55px; }
+    .hero:after { right: -55px; bottom: -110px; width: 230px; height: 230px; }
+    .eyebrow {
+      display: inline-block;
+      padding: 4px 12px;
+      border: 1px solid #a99a85;
+      border-radius: 2px;
+      color: var(--wood-dark);
+      font-size: .75rem;
+      letter-spacing: .18em;
+    }
+    h1 {
+      margin: 16px 0 7px;
+      font-family: "Noto Serif TC", "Songti TC", serif;
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-weight: 500;
+      line-height: 1.25;
+      letter-spacing: .12em;
+    }
+    .hero p { margin: 0; font-size: .98rem; }
+    .hero .sub { margin-top: 10px; color: #6f675b; font-size: .86rem; }
+
+    .wrap { width: min(900px, calc(100% - 30px)); margin: 28px auto 60px; }
+    .toolbar {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 12px; flex-wrap: wrap; margin: 0 0 16px;
+    }
+    .note { color: var(--muted); font-size: .85rem; }
+    button {
+      border: 1px solid #cfc3b2; border-radius: 3px; padding: 9px 15px;
+      background: #e7dfd2; color: var(--ink); font: inherit;
+      font-size: .85rem; font-weight: 600; cursor: pointer;
+      transition: background .18s ease;
+    }
+    button:hover { background: #d9cebd; }
+
+    .day {
+      margin: 13px 0; overflow: hidden; background: var(--paper);
+      border: 1px solid #e4dbce; border-radius: 5px;
+      box-shadow: 0 3px 12px #4a40300a;
+    }
+    .day summary {
+      display: flex; align-items: center; gap: 15px; padding: 18px 20px;
+      cursor: pointer; list-style: none; background: #fbf9f4;
+    }
+    .day summary::-webkit-details-marker { display: none; }
+    .day summary:after {
+      content: "+"; display: grid; place-items: center; margin-left: auto;
+      flex: 0 0 28px; width: 28px; height: 28px; border: 1px solid #d9cdbb;
+      border-radius: 50%; color: var(--wood-dark); font-size: 1rem; font-weight: 400;
+    }
+    .day[open] summary:after { content: "−"; background: var(--sage-light); border-color: #cbd3c4; color: #59634f; }
+    .day-number {
+      display: grid; place-items: center; flex: 0 0 52px; width: 52px; height: 52px;
+      border: 1px solid #c9b69e; border-radius: 3px; background: #e7dfd2;
+      color: var(--wood-dark); font-size: .76rem; font-weight: 700; line-height: 1.25;
+      text-align: center; letter-spacing: .04em;
+    }
+    .day:nth-of-type(3n) .day-number { background: #e5e9df; border-color: #c9d1c1; color: #59634f; }
+    .day:nth-of-type(3n + 1) .day-number { background: #f0e8dc; border-color: #d9c9b5; color: #72583e; }
+    .day-title { font-weight: 700; font-size: 1.03rem; }
+    .day-date { color: var(--muted); font-size: .8rem; }
+    .day-content { padding: 8px 22px 22px 25px; border-top: 1px solid #f0ebe2; }
+    .timeline { position: relative; margin-left: 8px; padding-left: 23px; border-left: 1px solid #d8cbbb; }
+    .item { position: relative; padding: 11px 0 14px; }
+    .item:before {
+      content: ""; position: absolute; left: -29px; top: 21px; width: 9px; height: 9px;
+      border: 2px solid var(--paper); border-radius: 50%; background: var(--sage);
+      box-shadow: 0 0 0 1px #aab29f;
+    }
+    .time { display: inline-block; margin-bottom: 3px; color: var(--wood-dark); font-size: .8rem; font-weight: 700; letter-spacing: .04em; }
+    .item h3 { display: inline; margin: 0; font-size: .98rem; font-weight: 700; }
+    .item p { margin: 4px 0 0; color: #746e64; font-size: .9rem; }
+    .map-link { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; font-size: .83rem; }
+    .tag { display: inline-block; margin-left: 6px; padding: 1px 7px; border: 1px solid #cbd3c4; border-radius: 2px; background: #edf0e9; color: #59634f; font-size: .7rem; font-weight: 600; vertical-align: 2px; }
+    .todo { padding: 14px 16px; border: 1px dashed #d8cbbb; border-radius: 3px; background: #fbf9f4; color: var(--muted); font-size: .9rem; }
+    .footer { padding: 24px 8px; color: var(--muted); font-size: .8rem; text-align: center; }
+    .footer strong { color: var(--wood-dark); }
+
+    @media (min-width: 700px) {
+      .wrap { margin-top: 34px; }
+      .day summary { padding: 20px 24px; }
+      .day-content { padding: 8px 30px 24px 32px; }
+      .day-title { font-size: 1.1rem; }
+      .item h3 { font-size: 1.02rem; }
+    }
+    @media (max-width: 380px) {
+      .day summary { gap: 10px; padding: 13px 11px; }
+      .day-number { flex-basis: 46px; width: 46px; height: 46px; }
+      .day-title { font-size: .93rem; }
+      .day-date { font-size: .72rem; }
+      .day-content { padding-right: 12px; padding-left: 17px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *:before, *:after { transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <span class="eyebrow">TOKYO TRIP · 2026</span>
+    <h1>宅宅之旅 🇯🇵</h1>
+    <p>日本東京 7 天 6 夜</p>
+    <div class="sub">12/6（日）— 12/12（六）｜吃吃逛逛、快樂朝聖！</div>
+  </header>
+
+  <main class="wrap">
+    <div class="toolbar">
+      <div class="note">📍 點開每天的卡片查看行程；景點名稱下方可開啟 Google 地圖。</div>
+      <div><button id="toggleAll" type="button" aria-expanded="false">展開全部天數</button></div>
+    </div>
+
+    <details class="day" open>
+      <summary><span class="day-number">DAY<br>01</span><span><span class="day-title">出發！抵達東京</span><br><span class="day-date">12/6（日）｜桃園 → 成田 → 上野</span></span></summary>
+      <div class="day-content"><div class="timeline">
+        <section class="item"><span class="time">13:00</span><h3>抵達桃園機場第一航廈</h3><p>辦理報到、托運行李與出境手續。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=桃園國際機場第一航廈" target="_blank" rel="noopener">📍 Google 地圖：桃園機場第一航廈 ↗</a></section>
+        <section class="item"><span class="time">15:35</span><h3>台灣虎航 IT202｜TPE → NRT</h3><p>第一航廈出發，航班表定 19:35 抵達東京成田機場。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=成田國際機場" target="_blank" rel="noopener">📍 Google 地圖：成田國際機場 ↗</a></section>
+        <section class="item"><span class="time">約 20:30</span><h3>搭乘 Skyliner 前往市區</h3><p>此為預估時間，請依實際入境、領行李及車票狀況調整。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=京成電鐵Skyliner+成田機場" target="_blank" rel="noopener">🚆 Google 地圖：Skyliner 成田機場 ↗</a></section>
+        <section class="item"><span class="time">晚上</span><h3>入住 the tourist hotel（秋葉原）</h3><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=the+tourist+hotel+akihabara" target="_blank" rel="noopener">🏨 Google 地圖：the tourist hotel ↗</a></section>
+        <section class="item"><span class="time">宵夜</span><h3>一蘭 アトレ上野山下口店</h3><p>抵達東京的第一碗拉麵！</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=一蘭+アトレ上野山下口店" target="_blank" rel="noopener">🍜 Google 地圖：一蘭上野山下口店 ↗</a></section>
+      </div></div>
+    </details>
+
+    <details class="day" open>
+      <summary><span class="day-number">DAY<br>02</span><span><span class="day-title">東京市區散策・MAPPA 朝聖</span><br><span class="day-date">12/7（一）｜美食、東京車站、有樂町、神保町</span></span></summary>
+      <div class="day-content"><div class="timeline">
+        <section class="item"><span class="time">早午餐</span><h3>BUTTER 美瑛放牧酪農場／根室花丸壽司</h3><p>兩間擇一，出發前可再確認分店、營業時間與排隊狀況。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=BUTTER+美瑛放牧酪農場+東京" target="_blank" rel="noopener">🥞 Google 地圖：BUTTER 美瑛放牧酪農場 ↗</a><br><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=根室花まる+東京" target="_blank" rel="noopener">🍣 Google 地圖：根室花丸壽司 ↗</a></section>
+        <section class="item"><span class="time">上午</span><h3>東京車站逛逛</h3><p>車站商店、伴手禮與周邊街區自由散策。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=東京車站" target="_blank" rel="noopener">📍 Google 地圖：東京車站 ↗</a></section>
+        <section class="item"><span class="time">咖啡時間</span><h3>Tully’s Coffee</h3><p>途中找一間順路的分店休息。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Tully%27s+Coffee+東京車站" target="_blank" rel="noopener">☕ Google 地圖：Tully’s Coffee（東京車站周邊）↗</a></section>
+        <section class="item"><span class="time">14:00</span><h3>MAPPA EXPO 15th Anniversary <span class="tag">已預約</span></h3><p>地點：有樂町美術館。建議預留交通與入場時間。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=有楽町マリオン+有楽町美術館" target="_blank" rel="noopener">🎨 Google 地圖：有樂町美術館／有樂町一帶 ↗</a></section>
+        <section class="item"><span class="time">之後</span><h3>THE ジャンプショップ 神保町</h3><p>動漫周邊巡禮。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=THE+ジャンプショップ+神保町" target="_blank" rel="noopener">🛍️ Google 地圖：JUMP SHOP 神保町 ↗</a></section>
+        <section class="item"><span class="time">有空再去</span><h3>上野 HATCOFFEE</h3><p>可視當天時間與體力彈性安排。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=HATCOFFEE+上野" target="_blank" rel="noopener">☕ Google 地圖：HATCOFFEE 上野 ↗</a></section>
+        <section class="item"><span class="time">晚餐</span><h3>稻庭烏龍麵／金子半之助</h3><p>晚餐二選一，依當天所在位置決定比較順路的店。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=稲庭うどん+東京" target="_blank" rel="noopener">🍜 Google 地圖：稻庭烏龍麵（東京）↗</a><br><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=金子半之助+東京" target="_blank" rel="noopener">🍤 Google 地圖：金子半之助（東京）↗</a></section>
+        <section class="item"><span class="time">晚上</span><h3>東京車站逛逛 → 回飯店</h3><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=the+tourist+hotel+akihabara" target="_blank" rel="noopener">🏨 Google 地圖：the tourist hotel ↗</a></section>
+      </div></div>
+    </details>
+
+    <details class="day"><summary><span class="day-number">DAY<br>03</span><span><span class="day-title">新宿・原宿・澀谷動漫美食巡禮</span><br><span class="day-date">12/8（二）｜早餐、海賊王、吉伊卡哇</span></span></summary><div class="day-content"><div class="timeline">
+      <section class="item"><span class="time">早餐</span><h3>新宿 eggslut</h3><p>享用早餐，出發前可確認分店營業時間。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=eggslut+新宿" target="_blank" rel="noopener">🍳 Google 地圖：eggslut 新宿 ↗</a></section>
+      <section class="item"><span class="time">11:00</span><h3>ONE PIECE BASE SHOP</h3><p>海賊王官方商店巡禮。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=ONE+PIECE+BASE+SHOP+新宿丸井" target="_blank" rel="noopener">🏴‍☠️ Google 地圖：ONE PIECE BASE SHOP ↗</a></section>
+      <section class="item"><span class="time">午餐</span><h3>新宿檸檬牛舌</h3><p>新宿吃牛舌，店名與分店可再確認。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=檸檬牛たん+新宿" target="_blank" rel="noopener">🥩 Google 地圖：新宿檸檬牛舌 ↗</a></section>
+      <section class="item"><span class="time">下午</span><h3>原宿・吉伊卡哇麵包店</h3><p>前往吉伊卡哇主題麵包店，建議事先確認預約或入店規則。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=ちいかわベーカリー+原宿" target="_blank" rel="noopener">🥐 Google 地圖：吉伊卡哇麵包店 ↗</a></section>
+      <section class="item"><span class="time">下午茶</span><h3>澀谷 Kenyan 奶茶</h3><p>在澀谷喝杯奶茶休息一下。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Kenyan+紅茶+渋谷" target="_blank" rel="noopener">🧋 Google 地圖：Kenyan 奶茶 ↗</a></section>
+      <section class="item"><span class="time">晚餐</span><h3>敘敘苑 東京歌劇城 53F 店</h3><p>預計於東京歌劇城高樓層享用燒肉晚餐。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=叙々苑+東京オペラシティ53F店" target="_blank" rel="noopener">🥩 Google 地圖：敘敘苑 東京歌劇城 53F 店 ↗</a></section>
+    </div></div></details>
+    <details class="day"><summary><span class="day-number">DAY<br>04</span><span><span class="day-title">咖啡・神宮・六本木冬季點燈</span><br><span class="day-date">12/9（三）｜東京市區 → 幕張豐砂</span></span></summary><div class="day-content"><div class="timeline">
+      <section class="item"><span class="time">早上</span><h3>Fuglen Tokyo</h3><p>從咖啡開始一天。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Fuglen+Tokyo" target="_blank" rel="noopener">☕ Google 地圖：Fuglen Tokyo ↗</a></section>
+      <section class="item"><span class="time">上午</span><h3>明治神宮</h3><p>在森林參道散步、參拜。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=明治神宮" target="_blank" rel="noopener">⛩️ Google 地圖：明治神宮 ↗</a></section>
+      <section class="item"><span class="time">下午</span><h3>國立新美術館</h3><p>可依當期展覽安排參觀。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=国立新美術館" target="_blank" rel="noopener">🖼️ Google 地圖：國立新美術館 ↗</a></section>
+      <section class="item"><span class="time">傍晚</span><h3>六本木點燈</h3><p>欣賞冬季燈飾；實際展區與點燈時間請以當年度公告為準。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=六本木+イルミネーション" target="_blank" rel="noopener">✨ Google 地圖：六本木點燈 ↗</a></section>
+      <section class="item"><span class="time">晚餐</span><h3>Ginza Lion Beer Hall</h3><p>晚餐安排在銀座啤酒餐廳。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=銀座ライオン+ビヤホール+銀座" target="_blank" rel="noopener">🍺 Google 地圖：Ginza Lion Beer Hall ↗</a></section>
+      <section class="item"><span class="time">晚上</span><h3>前往 JR 東日本飯店幕張豐砂・Check-in</h3><p>當晚更換住宿，建議預留市區前往幕張豐砂的交通時間。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=JR東日本ホテルメッツ+プレミア+幕張豊砂" target="_blank" rel="noopener">🏨 Google 地圖：JR 東日本飯店幕張豐砂 ↗</a></section>
+    </div></div></details>
+    <details class="day"><summary><span class="day-number">DAY<br>05</span><span><span class="day-title">東京迪士尼海洋</span><br><span class="day-date">12/10（四）｜一整天玩樂</span></span></summary><div class="day-content"><div class="timeline">
+      <section class="item"><span class="time">全天</span><h3>東京迪士尼海洋 Tokyo DisneySea</h3><p>建議事先確認入園時間、門票、園區營運資訊與想玩的設施，並依當天體力安排休息。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Tokyo+DisneySea" target="_blank" rel="noopener">🎢 Google 地圖：東京迪士尼海洋 ↗</a></section>
+      <section class="item"><span class="time">晚上</span><h3>返回幕張豐砂住宿</h3><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=JR東日本ホテルメッツ+プレミア+幕張豊砂" target="_blank" rel="noopener">🏨 Google 地圖：JR 東日本飯店幕張豐砂 ↗</a></section>
+    </div></div></details>
+    <details class="day"><summary><span class="day-number">DAY<br>06</span><span><span class="day-title">Tokyo Comic Con・吉伊卡哇聖誕市集</span><br><span class="day-date">12/11（五）｜幕張展覽館</span></span></summary><div class="day-content"><div class="timeline">
+      <section class="item"><span class="time">11:00–19:00</span><h3>Tokyo Comic Con 2026｜幕張展覽館</h3><p>官方目前公布 12/11（五）活動時間為 11:00–19:00，實際安排仍請以官方公告為準。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=幕張メッセ" target="_blank" rel="noopener">🎬 Google 地圖：幕張展覽館 ↗</a><br><a class="map-link" href="https://tokyocomiccon.jp/" target="_blank" rel="noopener">🔗 Tokyo Comic Con 官方網站 ↗</a></section>
+      <section class="item"><span class="time">另行安排</span><h3>吉伊卡哇耶誕市集</h3><p>市集地點與當日營業時間尚待確認，建議出發前查閱官方最新公告，並預留前往市集的交通時間。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=ちいかわ+クリスマスマーケット+東京" target="_blank" rel="noopener">🎄 Google 地圖：吉伊卡哇耶誕市集搜尋 ↗</a></section>
+      <section class="item"><span class="time">晚上</span><h3>返回幕張豐砂住宿</h3><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=JR東日本ホテルメッツ+プレミア+幕張豊砂" target="_blank" rel="noopener">🏨 Google 地圖：JR 東日本飯店幕張豐砂 ↗</a></section>
+    </div></div></details>
+    <details class="day"><summary><span class="day-number">DAY<br>07</span><span><span class="day-title">回台灣・旅程完結</span><br><span class="day-date">12/12（六）｜幕張豐砂 → 成田 → 桃園</span></span></summary><div class="day-content"><div class="timeline">
+      <section class="item"><span class="time">出發前</span><h3>退房・前往成田機場</h3><p>建議預留充足的交通、報到與出境時間，並再次確認航廈與行李規定。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=成田国際空港" target="_blank" rel="noopener">✈️ Google 地圖：成田國際機場 ↗</a></section>
+      <section class="item"><span class="time">18:30</span><h3>台灣虎航回程航班起飛</h3><p>成田機場出發，航班表定 21:50 抵達桃園機場。</p></section>
+      <section class="item"><span class="time">21:50</span><h3>抵達桃園機場</h3><p>宅宅之旅圓滿結束！</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=桃園國際機場第一航廈" target="_blank" rel="noopener">🏠 Google 地圖：桃園國際機場 ↗</a></section>
+    </div></div></details>
+
+    <footer class="footer">Made with ✦ for <strong>宅宅之旅</strong> ｜ 點選景點可開啟 Google 地圖<br>航班、營業時間與交通班次請以官方最新資訊為準。</footer>
+  </main>
+  <script>
+    const toggleButton = document.getElementById('toggleAll');
+    const dayCards = Array.from(document.querySelectorAll('details.day'));
+    toggleButton.addEventListener('click', () => {
+      const shouldOpen = toggleButton.getAttribute('aria-expanded') !== 'true';
+      dayCards.forEach(card => { card.open = shouldOpen; });
+      toggleButton.setAttribute('aria-expanded', String(shouldOpen));
+      toggleButton.textContent = shouldOpen ? '收合全部天數' : '展開全部天數';
+    });
+    dayCards.forEach(card => card.addEventListener('toggle', () => {
+      const allOpen = dayCards.every(item => item.open);
+      toggleButton.setAttribute('aria-expanded', String(allOpen));
+      toggleButton.textContent = allOpen ? '收合全部天數' : '展開全部天數';
+    }));
+  </script>
+</body>
+</html>
