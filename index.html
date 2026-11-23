@@ -34,30 +34,25 @@
 
     .hero {
       position: relative;
+      display: flex;
+      min-height: clamp(340px, 62vh, 620px);
       overflow: hidden;
-      padding: 58px 20px 48px;
-      text-align: center;
-      color: var(--ink);
-      background: linear-gradient(135deg, #e8dfd1 0%, #f2ede4 55%, #dce2d5 100%);
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-start;
+      padding: clamp(32px, 7vw, 76px);
+      text-align: left;
+      color: #fff;
+      background: linear-gradient(0deg, rgba(30, 35, 31, .48), rgba(30, 35, 31, .02) 65%), url("cover-tokyo.jpg") center 48% / cover no-repeat;
       border-bottom: 1px solid #d8cebf;
     }
-    .hero:before, .hero:after {
-      position: absolute;
-      content: "";
-      width: 170px;
-      height: 170px;
-      border: 1px solid #ffffff8a;
-      border-radius: 50%;
-      pointer-events: none;
-    }
-    .hero:before { top: -95px; left: -55px; }
-    .hero:after { right: -55px; bottom: -110px; width: 230px; height: 230px; }
+    .hero:before, .hero:after { display: none; }
     .eyebrow {
       display: inline-block;
       padding: 4px 12px;
-      border: 1px solid #a99a85;
+      border: 1px solid #ffffffb0;
       border-radius: 2px;
-      color: var(--wood-dark);
+      color: #fff;
       font-size: .75rem;
       letter-spacing: .18em;
     }
@@ -69,8 +64,11 @@
       line-height: 1.25;
       letter-spacing: .12em;
     }
-    .hero p { margin: 0; font-size: .98rem; }
-    .hero .sub { margin-top: 10px; color: #6f675b; font-size: .86rem; }
+    .hero p { margin: 0; font-size: .98rem; color: #fff; }
+    .hero .sub { margin-top: 10px; color: #ffffffdf; font-size: .86rem; }
+    @media (max-width: 600px) {
+      .hero { min-height: 420px; padding: 30px 24px 38px; background-position: 58% center; }
+    }
 
     .wrap { width: min(900px, calc(100% - 30px)); margin: 28px auto 60px; }
     .toolbar {
@@ -151,10 +149,10 @@
 </head>
 <body>
   <header class="hero">
-    <span class="eyebrow">TOKYO TRIP · 2026</span>
-    <h1> 🇯🇵</h1>
+    <span class="eyebrow">TOKYO TRIP</span>
+    <h1>2026 東京</h1>
     <p>日本東京 7 天 6 夜</p>
-    <div class="sub">12/6（日）— 12/12（六）｜</div>
+    <div class="sub">12/6 — 12/12</div>
   </header>
 
   <main class="wrap">
