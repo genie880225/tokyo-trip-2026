@@ -218,6 +218,13 @@
     .itinerary-field textarea { min-height:62px; resize:vertical; }
     .itinerary-field input:focus, .itinerary-field textarea:focus { border-color:var(--sage); box-shadow:0 0 0 2px #8b97821c; }
     .shopping-list { display:grid; gap:9px; }
+    .shopping-category { margin:18px 0 8px; color:var(--wood-dark); font-size:1rem; font-weight:700; }
+    .shopping-category:first-child { margin-top:4px; }
+    .shopping-category-count { margin-left:7px; color:var(--muted); font-size:.76rem; font-weight:400; }
+    .shopping-category-form { display:flex; gap:8px; align-items:end; flex-wrap:wrap; margin:0 0 14px; padding:12px; background:#fbf9f4; border:1px dashed var(--line); }
+    .shopping-category-form label { display:flex; flex-direction:column; gap:4px; flex:1; min-width:170px; color:var(--muted); font-size:.8rem; }
+    .shopping-category-form input,.shopping-form-select { width:100%; min-width:0; padding:10px; border:1px solid #d9d0c4; border-radius:3px; background:#fffdf8; color:var(--ink); font:inherit; font-size:.92rem; }
+    .shopping-category-form button { white-space:nowrap; }
     .shopping-row { display:flex; align-items:flex-start; gap:10px; padding:12px; border:1px solid #eee8de; border-radius:3px; background:#fcfaf6; }
     .shopping-row input[type=checkbox] { width:18px; height:18px; margin:4px 0 0; accent-color:var(--sage); flex:0 0 auto; }
     .shopping-row-main { flex:1; min-width:0; }
@@ -377,12 +384,17 @@
       <div class="panel-card">
         <form id="shoppingForm" class="expense-form">
           <label class="wide">想買的商品<input type="text" id="shoppingName" maxlength="100" placeholder="例如：吉伊卡哇周邊、藥妝、伴手禮" required></label>
+          <label>分類<select id="shoppingCategory" class="shopping-form-select"></select></label>
           <label>備註／店家（選填）<input type="text" id="shoppingMemo" maxlength="100" placeholder="例如：原宿店、幫朋友代買"></label>
           <label>商品圖片（選填）<input type="file" id="shoppingImage" accept="image/*"><span class="shopping-upload-hint">可上傳商品照片或截圖，會自動縮小後儲存</span></label>
           <button type="submit">＋ 加入清單</button>
         </form>
       </div>
       <div class="panel-card">
+        <form id="shoppingCategoryForm" class="shopping-category-form">
+          <label>新增自己的分類<input id="shoppingNewCategory" type="text" maxlength="30" placeholder="例如：文具、動漫周邊"></label>
+          <button type="submit">＋ 新增分類</button>
+        </form>
         <div class="progress-meta"><span>購物進度</span><strong id="shoppingCount">0 / 0 已完成</strong></div>
         <div id="shoppingList" class="shopping-list"></div>
         <div id="shoppingEmpty" class="empty-state">還沒有購物項目，先把想買的東西加進來吧！</div>
@@ -622,42 +634,70 @@
     });
     renderExpenses();
 
-    // Shopping checklist saved locally in this browser.
+    // Shopping checklist with built-in and user-defined categories.
     const shoppingKey = 'tokyoTrip2026ShoppingList';
+    const shoppingCategoryKey = 'tokyoTrip2026ShoppingCategories';
+    const defaultShoppingCategories = ['藥妝','食物','咖啡豆','ONE PIECE BASE SHOP'];
+    let shoppingCategories = [...defaultShoppingCategories];
+    try {
+      const savedCategories = JSON.parse(localStorage.getItem(shoppingCategoryKey) || '[]');
+      if (Array.isArray(savedCategories)) savedCategories.forEach(c => { if (typeof c === 'string' && c.trim() && !shoppingCategories.includes(c.trim())) shoppingCategories.push(c.trim()); });
+    } catch(e) {}
     let shoppingItems = [];
     try { shoppingItems = JSON.parse(localStorage.getItem(shoppingKey) || '[]'); if (!Array.isArray(shoppingItems)) shoppingItems = []; } catch(e) { shoppingItems = []; }
-    shoppingItems.forEach(item => { delete item.payer; delete item.paymentNote; });
-    localStorage.setItem(shoppingKey, JSON.stringify(shoppingItems));
+    shoppingItems.forEach(item => { delete item.payer; delete item.paymentNote; if (!item.category) item.category = '未分類'; });
     const shoppingList = document.getElementById('shoppingList');
+    const shoppingCategorySelect = document.getElementById('shoppingCategory');
+    function saveShoppingCategories() { localStorage.setItem(shoppingCategoryKey, JSON.stringify(shoppingCategories)); }
+    function renderShoppingCategoryOptions() {
+      const current = shoppingCategorySelect.value;
+      shoppingCategorySelect.replaceChildren();
+      const options = [...(shoppingItems.some(x => x.category === '未分類') ? ['未分類'] : []), ...shoppingCategories];
+      options.forEach(category => { const option = document.createElement('option'); option.value = category; option.textContent = category; shoppingCategorySelect.appendChild(option); });
+      if (options.includes(current)) shoppingCategorySelect.value = current;
+    }
     function saveShopping() { localStorage.setItem(shoppingKey, JSON.stringify(shoppingItems)); renderShopping(); }
     function renderShopping() {
       shoppingList.replaceChildren();
       const done = shoppingItems.filter(x => x.done).length;
       document.getElementById('shoppingCount').textContent = `${done} / ${shoppingItems.length} 已完成`;
       document.getElementById('shoppingEmpty').style.display = shoppingItems.length ? 'none' : 'block';
-      shoppingItems.forEach(item => {
-        const row = document.createElement('div'); row.className = 'shopping-row' + (item.done ? ' done' : '');
-        const check = document.createElement('input'); check.type = 'checkbox'; check.checked = !!item.done; check.setAttribute('aria-label', '標記完成：' + item.name);
-        check.addEventListener('change', () => { item.done = check.checked; saveShopping(); });
-        const main = document.createElement('div'); main.className = 'shopping-row-main';
-        const name = document.createElement('div'); name.className = 'shopping-row-name'; name.textContent = item.name; main.appendChild(name);
-        if (item.memo) { const memo = document.createElement('div'); memo.className = 'shopping-row-memo'; memo.textContent = '備註／店家：' + item.memo; main.appendChild(memo); }
-        if (item.image) {
-          const photo = document.createElement('img'); photo.className = 'shopping-photo'; photo.src = item.image; photo.alt = item.name + ' 商品圖片';
-          photo.addEventListener('click', () => window.open(item.image, '_blank')); main.appendChild(photo);
-        }
-        const actions = document.createElement('div'); actions.className = 'shopping-photo-actions';
-        const changePhoto = document.createElement('button'); changePhoto.type = 'button'; changePhoto.textContent = item.image ? '更換圖片' : '新增圖片';
-        const photoInput = document.createElement('input'); photoInput.type = 'file'; photoInput.accept = 'image/*'; photoInput.hidden = true;
-        changePhoto.addEventListener('click', () => photoInput.click());
-        photoInput.addEventListener('change', async () => { const file = photoInput.files && photoInput.files[0]; if (!file) return; try { item.image = await compressShoppingImage(file); saveShopping(); } catch(e) { alert('圖片處理失敗，請換一張圖片再試一次。'); } });
-        actions.append(changePhoto, photoInput);
-        if (item.image) { const removePhoto = document.createElement('button'); removePhoto.type = 'button'; removePhoto.textContent = '移除圖片'; removePhoto.addEventListener('click', () => { delete item.image; saveShopping(); }); actions.appendChild(removePhoto); }
-        main.appendChild(actions);
-        const del = document.createElement('button'); del.type = 'button'; del.className = 'shopping-delete'; del.textContent = '刪除'; del.addEventListener('click', () => { shoppingItems = shoppingItems.filter(x => x.id !== item.id); saveShopping(); });
-        row.append(check, main, del); shoppingList.appendChild(row);
+      renderShoppingCategoryOptions();
+      const orderedCategories = [...(shoppingItems.some(x => x.category === '未分類') ? ['未分類'] : []), ...shoppingCategories];
+      orderedCategories.forEach(category => {
+        const items = shoppingItems.filter(x => (x.category || '未分類') === category);
+        if (!items.length) return;
+        const heading = document.createElement('h3'); heading.className = 'shopping-category'; heading.textContent = category;
+        const count = document.createElement('span'); count.className = 'shopping-category-count'; count.textContent = `${items.length} 項`; heading.appendChild(count); shoppingList.appendChild(heading);
+        items.forEach(item => {
+          const row = document.createElement('div'); row.className = 'shopping-row' + (item.done ? ' done' : '');
+          const check = document.createElement('input'); check.type = 'checkbox'; check.checked = !!item.done; check.setAttribute('aria-label', '標記完成：' + item.name);
+          check.addEventListener('change', () => { item.done = check.checked; saveShopping(); });
+          const main = document.createElement('div'); main.className = 'shopping-row-main';
+          const name = document.createElement('div'); name.className = 'shopping-row-name'; name.textContent = item.name; main.appendChild(name);
+          if (item.memo) { const memo = document.createElement('div'); memo.className = 'shopping-row-memo'; memo.textContent = '備註／店家：' + item.memo; main.appendChild(memo); }
+          if (item.image) { const photo = document.createElement('img'); photo.className = 'shopping-photo'; photo.src = item.image; photo.alt = item.name + ' 商品圖片'; photo.addEventListener('click', () => window.open(item.image, '_blank')); main.appendChild(photo); }
+          const actions = document.createElement('div'); actions.className = 'shopping-photo-actions';
+          const changePhoto = document.createElement('button'); changePhoto.type = 'button'; changePhoto.textContent = item.image ? '更換圖片' : '新增圖片';
+          const photoInput = document.createElement('input'); photoInput.type = 'file'; photoInput.accept = 'image/*'; photoInput.hidden = true;
+          changePhoto.addEventListener('click', () => photoInput.click());
+          photoInput.addEventListener('change', async () => { const file = photoInput.files && photoInput.files[0]; if (!file) return; try { item.image = await compressShoppingImage(file); saveShopping(); } catch(e) { alert('圖片處理失敗，請換一張圖片再試一次。'); } });
+          actions.append(changePhoto, photoInput);
+          if (item.image) { const removePhoto = document.createElement('button'); removePhoto.type = 'button'; removePhoto.textContent = '移除圖片'; removePhoto.addEventListener('click', () => { delete item.image; saveShopping(); }); actions.appendChild(removePhoto); }
+          main.appendChild(actions);
+          const del = document.createElement('button'); del.type = 'button'; del.className = 'shopping-delete'; del.textContent = '刪除'; del.addEventListener('click', () => { shoppingItems = shoppingItems.filter(x => x.id !== item.id); saveShopping(); });
+          row.append(check, main, del); shoppingList.appendChild(row);
+        });
       });
     }
+    document.getElementById('shoppingCategoryForm').addEventListener('submit', event => {
+      event.preventDefault();
+      const input = document.getElementById('shoppingNewCategory');
+      const category = input.value.trim();
+      if (!category) return;
+      if (shoppingCategories.includes(category) || category === '未分類') { alert('這個分類已經存在囉！'); return; }
+      shoppingCategories.push(category); saveShoppingCategories(); input.value = ''; renderShoppingCategoryOptions(); shoppingCategorySelect.value = category;
+    });
     function compressShoppingImage(file) {
       return new Promise((resolve, reject) => {
         if (!file.type.startsWith('image/')) { reject(new Error('not image')); return; }
@@ -687,9 +727,10 @@
         try { image = await compressShoppingImage(imageFile); }
         catch(e) { alert('圖片處理失敗，請換一張圖片再試一次。'); return; }
       }
-      shoppingItems.push({id:Date.now().toString(36) + Math.random().toString(36).slice(2,7), name, memo, image, done:false});
+      shoppingItems.push({id:Date.now().toString(36) + Math.random().toString(36).slice(2,7), name, memo, image, category:shoppingCategorySelect.value || defaultShoppingCategories[0], done:false});
       event.target.reset(); saveShopping();
     });
+    saveShoppingCategories();
     renderShopping();
   </script>
 </body>
