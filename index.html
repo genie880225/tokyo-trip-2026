@@ -363,6 +363,8 @@
         <form id="shoppingForm" class="expense-form">
           <label class="wide">想買的商品<input type="text" id="shoppingName" maxlength="100" placeholder="例如：吉伊卡哇周邊、藥妝、伴手禮" required></label>
           <label>備註／店家（選填）<input type="text" id="shoppingMemo" maxlength="100" placeholder="例如：原宿店、幫朋友代買"></label>
+          <label>付款人（選填）<input type="text" id="shoppingPayer" maxlength="60" placeholder="例如：小美"></label>
+          <label>付款備註（選填）<input type="text" id="shoppingPaymentNote" maxlength="120" placeholder="例如：小美已付、阿明未付"></label>
           <label>商品圖片（選填）<input type="file" id="shoppingImage" accept="image/*"><span class="shopping-upload-hint">可上傳商品照片或截圖，會自動縮小後儲存</span></label>
           <button type="submit">＋ 加入清單</button>
         </form>
@@ -585,12 +587,21 @@
         check.addEventListener('change', () => { item.done = check.checked; saveShopping(); });
         const main = document.createElement('div'); main.className = 'shopping-row-main';
         const name = document.createElement('div'); name.className = 'shopping-row-name'; name.textContent = item.name; main.appendChild(name);
-        if (item.memo) { const memo = document.createElement('div'); memo.className = 'shopping-row-memo'; memo.textContent = item.memo; main.appendChild(memo); }
+        if (item.memo) { const memo = document.createElement('div'); memo.className = 'shopping-row-memo'; memo.textContent = '備註／店家：' + item.memo; main.appendChild(memo); }
+        if (item.payer) { const payer = document.createElement('div'); payer.className = 'shopping-row-memo'; payer.textContent = '付款人：' + item.payer; main.appendChild(payer); }
+        if (item.paymentNote) { const paymentNote = document.createElement('div'); paymentNote.className = 'shopping-row-memo'; paymentNote.textContent = '付款備註：' + item.paymentNote; main.appendChild(paymentNote); }
         if (item.image) {
           const photo = document.createElement('img'); photo.className = 'shopping-photo'; photo.src = item.image; photo.alt = item.name + ' 商品圖片';
           photo.addEventListener('click', () => window.open(item.image, '_blank')); main.appendChild(photo);
         }
         const actions = document.createElement('div'); actions.className = 'shopping-photo-actions';
+        const editPayment = document.createElement('button'); editPayment.type = 'button'; editPayment.textContent = '編輯付款資訊';
+        editPayment.addEventListener('click', () => {
+          const payer = prompt('付款人：', item.payer || ''); if (payer === null) return;
+          const paymentNote = prompt('付款備註（可填誰已付／未付）：', item.paymentNote || ''); if (paymentNote === null) return;
+          item.payer = payer.trim(); item.paymentNote = paymentNote.trim(); saveShopping();
+        });
+        actions.appendChild(editPayment);
         const changePhoto = document.createElement('button'); changePhoto.type = 'button'; changePhoto.textContent = item.image ? '更換圖片' : '新增圖片';
         const photoInput = document.createElement('input'); photoInput.type = 'file'; photoInput.accept = 'image/*'; photoInput.hidden = true;
         changePhoto.addEventListener('click', () => photoInput.click());
@@ -624,6 +635,8 @@
       event.preventDefault();
       const name = document.getElementById('shoppingName').value.trim();
       const memo = document.getElementById('shoppingMemo').value.trim();
+      const payer = document.getElementById('shoppingPayer').value.trim();
+      const paymentNote = document.getElementById('shoppingPaymentNote').value.trim();
       const imageFile = document.getElementById('shoppingImage').files[0];
       if (!name) return;
       let image = '';
@@ -631,7 +644,7 @@
         try { image = await compressShoppingImage(imageFile); }
         catch(e) { alert('圖片處理失敗，請換一張圖片再試一次。'); return; }
       }
-      shoppingItems.push({id:Date.now().toString(36) + Math.random().toString(36).slice(2,7), name, memo, image, done:false});
+      shoppingItems.push({id:Date.now().toString(36) + Math.random().toString(36).slice(2,7), name, memo, payer, paymentNote, image, done:false});
       event.target.reset(); saveShopping();
     });
     renderShopping();
