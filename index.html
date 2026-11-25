@@ -181,8 +181,16 @@
     .packing-actions { display:flex; gap:4px; margin-left:auto; }
     .packing-actions button { padding:3px 7px; font-size:.72rem; white-space:nowrap; }
     .packing-add-form { display:flex; gap:8px; margin:14px 0 4px; }
-    .packing-add-form input { flex:1; min-width:0; padding:9px 11px; border:1px solid #d9d0c4; border-radius:3px; background:#fffdf8; color:var(--ink); font:inherit; }
-    .packing-add-form button { padding:8px 12px; }
+    .packing-add-form input,.packing-add-form select { min-width:0; padding:9px 11px; border:1px solid #d9d0c4; border-radius:3px; background:#fffdf8; color:var(--ink); font:inherit; }
+    .packing-add-form input { flex:1; }
+    .packing-add-form select { flex:0 1 190px; }
+    .packing-add-form button { padding:8px 12px; white-space:nowrap; }
+    .expense-edit-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; padding:12px; background:#f8f5ee; border:1px solid var(--line); border-radius:3px; }
+    .expense-edit-form label { display:flex; flex-direction:column; gap:4px; color:var(--muted); font-size:.76rem; }
+    .expense-edit-form input,.expense-edit-form select { width:100%; min-width:0; padding:8px; border:1px solid #d9d0c4; border-radius:3px; background:#fffdf8; color:var(--ink); font:inherit; font-size:.85rem; }
+    .expense-edit-form .wide { grid-column:1/-1; }
+    .expense-edit-actions { display:flex; gap:8px; grid-column:1/-1; }
+    .expense-edit-actions button { padding:7px 12px; }
     .progress-track { height:7px; overflow:hidden; background:#eee8de; border-radius:20px; }
     .progress-fill { height:100%; width:0; background:var(--sage); transition:width .2s; }
     .progress-meta { display:flex; justify-content:space-between; margin:8px 0 5px; color:var(--muted); font-size:.82rem; }
@@ -322,6 +330,12 @@
         <div id="packingGroups"></div>
         <form id="packingAddForm" class="packing-add-form">
           <input id="packingNewItem" type="text" maxlength="60" placeholder="輸入想新增的物品，例如：暖暖包" aria-label="新增打包物品" required>
+          <select id="packingNewCategory" aria-label="選擇物品分類">
+            <option value="0">重要證件與金錢</option>
+            <option value="1">3C 與電子用品</option>
+            <option value="2">衣物與個人用品</option>
+            <option value="3">隨身包與其他</option>
+          </select>
           <button type="submit">＋ 新增物品</button>
         </form>
       </div>
@@ -447,6 +461,8 @@
     try { packed = JSON.parse(localStorage.getItem(packingKey) || '{}') || {}; } catch(e) { packed = {}; }
     try { packingNames = JSON.parse(localStorage.getItem(packingNamesKey) || '{}') || {}; } catch(e) { packingNames = {}; }
     try { customPacking = JSON.parse(localStorage.getItem(customPackingKey) || '[]'); if (!Array.isArray(customPacking)) customPacking = []; } catch(e) { customPacking = []; }
+    // 舊版自訂物品沒有分類，先歸入「隨身包與其他」，之後新增可自行選分類。
+    customPacking.forEach(item => { if (item.category === undefined || item.category === null) item.category = 3; });
     const packingGroups = document.getElementById('packingGroups');
     function savePackingState() {
       localStorage.setItem(packingKey, JSON.stringify(packed));
@@ -488,15 +504,9 @@
         const heading = document.createElement('h3'); heading.textContent = group.title; section.appendChild(heading);
         const list = document.createElement('div'); list.className = 'packing-list';
         group.items.forEach((item, ii) => list.appendChild(makePackingItem(`${gi}-${ii}`, item)));
+        customPacking.filter(item => Number(item.category) === gi).forEach(item => list.appendChild(makePackingItem(item.id, item.name, true)));
         section.appendChild(list); packingGroups.appendChild(section);
       });
-      const customSection = document.createElement('section'); customSection.className = 'packing-group';
-      const customHeading = document.createElement('h3'); customHeading.textContent = '我的自訂物品'; customSection.appendChild(customHeading);
-      const customList = document.createElement('div'); customList.className = 'packing-list';
-      customPacking.forEach(item => customList.appendChild(makePackingItem(item.id, item.name, true)));
-      customSection.appendChild(customList);
-      if (!customPacking.length) { const hint = document.createElement('p'); hint.className='section-intro'; hint.textContent='還沒有自訂物品，可以在下方自行新增。'; customSection.appendChild(hint); }
-      packingGroups.appendChild(customSection);
       updatePackingProgress();
     }
     function updatePackingProgress() {
@@ -510,7 +520,7 @@
       event.preventDefault();
       const input = document.getElementById('packingNewItem'); const name = input.value.trim();
       if (!name) return;
-      customPacking.push({id:'custom-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), name});
+      customPacking.push({id:'custom-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), name, category:Number(document.getElementById('packingNewCategory').value)});
       input.value = ''; savePackingState(); renderPacking(); input.focus();
     });
     renderPacking();
@@ -530,6 +540,46 @@
       amountInput.placeholder = isTWD ? '例如：350' : '例如：1200';
     });
     function saveExpenses() { localStorage.setItem(expenseKey, JSON.stringify(expenses)); renderExpenses(); }
+    function addEditField(form, labelText, control, wide=false) {
+      const label = document.createElement('label');
+      if (wide) label.className = 'wide';
+      label.textContent = labelText; label.appendChild(control); form.appendChild(label);
+      return control;
+    }
+    function makeEditInput(value, type='text') {
+      const input = document.createElement('input'); input.type = type; input.value = value ?? ''; return input;
+    }
+    function makeEditSelect(options, value) {
+      const select = document.createElement('select');
+      options.forEach(option => { const opt=document.createElement('option'); opt.value=option; opt.textContent=option; select.appendChild(opt); });
+      select.value=value; return select;
+    }
+    function openExpenseEditor(item, currentRow) {
+      const editRow = document.createElement('tr');
+      const cell = document.createElement('td'); cell.colSpan = 6;
+      const form = document.createElement('form'); form.className = 'expense-edit-form';
+      const date = addEditField(form,'日期',makeEditInput(item.date,'date'));
+      const category = addEditField(form,'分類',makeEditSelect(['餐飲','交通','購物','門票／娛樂','住宿','其他'],item.category || '其他'));
+      const name = addEditField(form,'項目／備註',makeEditInput(item.name),true);
+      const currency = addEditField(form,'幣別',makeEditSelect(['JPY','TWD'],item.currency || 'JPY'));
+      const amount = addEditField(form,'金額',makeEditInput(item.amount,'number'));
+      amount.min='1'; amount.step='1';
+      const payment = addEditField(form,'付款方式',makeEditSelect(['現金','信用卡','PayPay'],item.payment || '現金'));
+      const payer = addEditField(form,'付款人',makeEditInput(item.payer || ''));
+      const paymentNote = addEditField(form,'付款備註',makeEditInput(item.paymentNote || ''),true);
+      const actions = document.createElement('div'); actions.className='expense-edit-actions';
+      const save = document.createElement('button'); save.type='submit'; save.textContent='儲存修改';
+      const cancel = document.createElement('button'); cancel.type='button'; cancel.textContent='取消'; cancel.addEventListener('click',renderExpenses);
+      actions.append(save,cancel); form.appendChild(actions);
+      form.addEventListener('submit',event=>{
+        event.preventDefault();
+        const numeric=Number(amount.value);
+        if (!name.value.trim() || !date.value || !Number.isFinite(numeric) || numeric<=0) { window.alert('請確認日期、項目與金額都已正確填寫。'); return; }
+        Object.assign(item,{date:date.value,category:category.value,name:name.value.trim(),currency:currency.value,amount:Math.round(numeric),payment:payment.value,payer:payer.value.trim(),paymentNote:paymentNote.value.trim()});
+        saveExpenses();
+      });
+      cell.appendChild(form); editRow.appendChild(cell); currentRow.replaceWith(editRow);
+    }
     function renderExpenses() {
       const tbody = document.getElementById('expenseRows'); tbody.replaceChildren();
       const totalJPY = expenses.filter(item => (item.currency || 'JPY') === 'JPY').reduce((sum, item) => sum + Number(item.amount || 0), 0);
@@ -547,9 +597,10 @@
         const paymentNote = document.createElement('td'); paymentNote.textContent = item.paymentNote || '—';
         const amount = document.createElement('td'); amount.className = 'amount'; amount.textContent = (item.currency === 'TWD' ? twd(item.amount) : yen(item.amount));
         const action = document.createElement('td');
+        const edit = document.createElement('button'); edit.type='button'; edit.className='delete-expense'; edit.textContent='修改'; edit.addEventListener('click',()=>openExpenseEditor(item,tr));
         const del = document.createElement('button'); del.type = 'button'; del.className = 'delete-expense'; del.textContent = '刪除'; del.setAttribute('aria-label','刪除 '+item.name);
         del.addEventListener('click', () => { expenses = expenses.filter(x => x.id !== item.id); saveExpenses(); });
-        action.appendChild(del); tr.append(detail,category,payment,paymentNote,amount,action); tbody.appendChild(tr);
+        action.append(edit,del); tr.append(detail,category,payment,paymentNote,amount,action); tbody.appendChild(tr);
       });
     }
     document.getElementById('expenseForm').addEventListener('submit', event => {
