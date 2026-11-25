@@ -346,12 +346,13 @@
           <label><span id="expenseAmountLabel">金額（日圓）</span><input type="number" id="expenseAmount" min="1" step="1" placeholder="例如：1200" required></label>
           <label>付款方式<select id="expensePayment"><option value="現金">現金</option><option value="信用卡">信用卡</option><option value="PayPay">PayPay</option></select></label>
           <label>付款人（選填）<input type="text" id="expensePayer" placeholder="例如：我" maxlength="20"></label>
+          <label class="wide">付款備註（選填）<input type="text" id="expensePaymentNote" placeholder="例如：小美已付、阿明未付" maxlength="120"></label>
           <button class="wide" type="submit">＋ 新增支出</button>
         </form>
       </div>
       <div class="panel-card">
         <h3 style="margin:0 0 8px;font-size:1rem">支出明細</h3>
-        <div style="overflow-x:auto"><table class="expense-table"><thead><tr><th>日期／項目</th><th>分類</th><th>付款方式</th><th style="text-align:right">金額</th><th></th></tr></thead><tbody id="expenseRows"></tbody></table></div>
+        <div style="overflow-x:auto"><table class="expense-table"><thead><tr><th>日期／項目</th><th>分類</th><th>付款方式</th><th>付款備註</th><th style="text-align:right">金額</th><th></th></tr></thead><tbody id="expenseRows"></tbody></table></div>
         <div id="expenseEmpty" class="empty-state">目前還沒有記帳紀錄，新增第一筆旅費吧！</div>
       </div>
     </section>
@@ -363,8 +364,6 @@
         <form id="shoppingForm" class="expense-form">
           <label class="wide">想買的商品<input type="text" id="shoppingName" maxlength="100" placeholder="例如：吉伊卡哇周邊、藥妝、伴手禮" required></label>
           <label>備註／店家（選填）<input type="text" id="shoppingMemo" maxlength="100" placeholder="例如：原宿店、幫朋友代買"></label>
-          <label>付款人（選填）<input type="text" id="shoppingPayer" maxlength="60" placeholder="例如：小美"></label>
-          <label>付款備註（選填）<input type="text" id="shoppingPaymentNote" maxlength="120" placeholder="例如：小美已付、阿明未付"></label>
           <label>商品圖片（選填）<input type="file" id="shoppingImage" accept="image/*"><span class="shopping-upload-hint">可上傳商品照片或截圖，會自動縮小後儲存</span></label>
           <button type="submit">＋ 加入清單</button>
         </form>
@@ -545,11 +544,12 @@
         detail.textContent = item.date.slice(5).replace('-','/') + ' · ' + item.name + (item.payer ? '（'+item.payer+'）' : '');
         const category = document.createElement('td'); category.textContent = item.category;
         const payment = document.createElement('td'); payment.className='expense-payment'; payment.textContent = item.payment || '現金';
+        const paymentNote = document.createElement('td'); paymentNote.textContent = item.paymentNote || '—';
         const amount = document.createElement('td'); amount.className = 'amount'; amount.textContent = (item.currency === 'TWD' ? twd(item.amount) : yen(item.amount));
         const action = document.createElement('td');
         const del = document.createElement('button'); del.type = 'button'; del.className = 'delete-expense'; del.textContent = '刪除'; del.setAttribute('aria-label','刪除 '+item.name);
         del.addEventListener('click', () => { expenses = expenses.filter(x => x.id !== item.id); saveExpenses(); });
-        action.appendChild(del); tr.append(detail,category,payment,amount,action); tbody.appendChild(tr);
+        action.appendChild(del); tr.append(detail,category,payment,paymentNote,amount,action); tbody.appendChild(tr);
       });
     }
     document.getElementById('expenseForm').addEventListener('submit', event => {
@@ -563,7 +563,8 @@
         category: document.getElementById('expenseCategory').value,
         name, amount: Math.round(amount), currency:currencySelect.value,
         payment:document.getElementById('expensePayment').value,
-        payer: document.getElementById('expensePayer').value.trim()
+        payer: document.getElementById('expensePayer').value.trim(),
+        paymentNote: document.getElementById('expensePaymentNote').value.trim()
       });
       event.target.reset(); document.getElementById('expenseDate').value = '2026-12-06';
       currencySelect.value='JPY'; currencySelect.dispatchEvent(new Event('change')); saveExpenses();
@@ -574,6 +575,8 @@
     const shoppingKey = 'tokyoTrip2026ShoppingList';
     let shoppingItems = [];
     try { shoppingItems = JSON.parse(localStorage.getItem(shoppingKey) || '[]'); if (!Array.isArray(shoppingItems)) shoppingItems = []; } catch(e) { shoppingItems = []; }
+    shoppingItems.forEach(item => { delete item.payer; delete item.paymentNote; });
+    localStorage.setItem(shoppingKey, JSON.stringify(shoppingItems));
     const shoppingList = document.getElementById('shoppingList');
     function saveShopping() { localStorage.setItem(shoppingKey, JSON.stringify(shoppingItems)); renderShopping(); }
     function renderShopping() {
@@ -588,20 +591,11 @@
         const main = document.createElement('div'); main.className = 'shopping-row-main';
         const name = document.createElement('div'); name.className = 'shopping-row-name'; name.textContent = item.name; main.appendChild(name);
         if (item.memo) { const memo = document.createElement('div'); memo.className = 'shopping-row-memo'; memo.textContent = '備註／店家：' + item.memo; main.appendChild(memo); }
-        if (item.payer) { const payer = document.createElement('div'); payer.className = 'shopping-row-memo'; payer.textContent = '付款人：' + item.payer; main.appendChild(payer); }
-        if (item.paymentNote) { const paymentNote = document.createElement('div'); paymentNote.className = 'shopping-row-memo'; paymentNote.textContent = '付款備註：' + item.paymentNote; main.appendChild(paymentNote); }
         if (item.image) {
           const photo = document.createElement('img'); photo.className = 'shopping-photo'; photo.src = item.image; photo.alt = item.name + ' 商品圖片';
           photo.addEventListener('click', () => window.open(item.image, '_blank')); main.appendChild(photo);
         }
         const actions = document.createElement('div'); actions.className = 'shopping-photo-actions';
-        const editPayment = document.createElement('button'); editPayment.type = 'button'; editPayment.textContent = '編輯付款資訊';
-        editPayment.addEventListener('click', () => {
-          const payer = prompt('付款人：', item.payer || ''); if (payer === null) return;
-          const paymentNote = prompt('付款備註（可填誰已付／未付）：', item.paymentNote || ''); if (paymentNote === null) return;
-          item.payer = payer.trim(); item.paymentNote = paymentNote.trim(); saveShopping();
-        });
-        actions.appendChild(editPayment);
         const changePhoto = document.createElement('button'); changePhoto.type = 'button'; changePhoto.textContent = item.image ? '更換圖片' : '新增圖片';
         const photoInput = document.createElement('input'); photoInput.type = 'file'; photoInput.accept = 'image/*'; photoInput.hidden = true;
         changePhoto.addEventListener('click', () => photoInput.click());
@@ -635,8 +629,6 @@
       event.preventDefault();
       const name = document.getElementById('shoppingName').value.trim();
       const memo = document.getElementById('shoppingMemo').value.trim();
-      const payer = document.getElementById('shoppingPayer').value.trim();
-      const paymentNote = document.getElementById('shoppingPaymentNote').value.trim();
       const imageFile = document.getElementById('shoppingImage').files[0];
       if (!name) return;
       let image = '';
@@ -644,7 +636,7 @@
         try { image = await compressShoppingImage(imageFile); }
         catch(e) { alert('圖片處理失敗，請換一張圖片再試一次。'); return; }
       }
-      shoppingItems.push({id:Date.now().toString(36) + Math.random().toString(36).slice(2,7), name, memo, payer, paymentNote, image, done:false});
+      shoppingItems.push({id:Date.now().toString(36) + Math.random().toString(36).slice(2,7), name, memo, image, done:false});
       event.target.reset(); saveShopping();
     });
     renderShopping();
