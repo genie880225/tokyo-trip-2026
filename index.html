@@ -175,7 +175,14 @@
     .packing-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
     .packing-item { display:flex; align-items:flex-start; gap:9px; padding:10px 11px; border:1px solid #eee8de; border-radius:3px; background:#fcfaf6; font-size:.9rem; }
     .packing-item input { width:17px; height:17px; margin:4px 0 0; accent-color:var(--sage); flex:0 0 auto; }
-    .packing-item.checked span { color:#999184; text-decoration:line-through; }
+    .packing-item.checked .packing-name { color:#999184; text-decoration:line-through; }
+    .packing-item { align-items:center; }
+    .packing-name { flex:1; min-width:0; overflow-wrap:anywhere; }
+    .packing-actions { display:flex; gap:4px; margin-left:auto; }
+    .packing-actions button { padding:3px 7px; font-size:.72rem; white-space:nowrap; }
+    .packing-add-form { display:flex; gap:8px; margin:14px 0 4px; }
+    .packing-add-form input { flex:1; min-width:0; padding:9px 11px; border:1px solid #d9d0c4; border-radius:3px; background:#fffdf8; color:var(--ink); font:inherit; }
+    .packing-add-form button { padding:8px 12px; }
     .progress-track { height:7px; overflow:hidden; background:#eee8de; border-radius:20px; }
     .progress-fill { height:100%; width:0; background:var(--sage); transition:width .2s; }
     .progress-meta { display:flex; justify-content:space-between; margin:8px 0 5px; color:var(--muted); font-size:.82rem; }
@@ -183,7 +190,7 @@
     .expense-form label { display:flex; flex-direction:column; gap:5px; color:var(--muted); font-size:.82rem; }
     .expense-form input,.expense-form select { width:100%; min-width:0; padding:10px; border:1px solid #d9d0c4; border-radius:3px; background:#fffdf8; color:var(--ink); font:inherit; font-size:.92rem; }
     .expense-form .wide { grid-column:1/-1; }
-    .expense-summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:14px 0; }
+    .expense-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:14px 0; }
     .expense-stat { padding:13px; background:#f4f0e8; border:1px solid var(--line); border-radius:3px; }
     .expense-stat small { display:block; color:var(--muted); font-size:.78rem; }
     .expense-stat strong { display:block; margin-top:3px; font-size:1.25rem; color:var(--wood-dark); }
@@ -192,6 +199,9 @@
     .expense-table th { color:var(--muted); font-weight:600; }
     .expense-table td.amount { text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
     .delete-expense { padding:4px 8px; font-size:.75rem; }
+    .expense-table td { vertical-align:top; }
+    .expense-table td.amount { text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    .expense-payment { color:var(--muted); font-size:.78rem; white-space:nowrap; }
     .empty-state { padding:20px 8px; color:var(--muted); text-align:center; font-size:.88rem; }
 
     .itinerary-field { margin-top:12px; }
@@ -205,10 +215,15 @@
     .shopping-row-main { flex:1; min-width:0; }
     .shopping-row-name { font-weight:600; overflow-wrap:anywhere; }
     .shopping-row-memo { color:var(--muted); font-size:.8rem; overflow-wrap:anywhere; }
+    .shopping-photo { display:block; width:92px; height:92px; margin-top:9px; object-fit:cover; border-radius:3px; border:1px solid var(--line); cursor:pointer; }
+    .shopping-photo-empty { margin-top:8px; color:var(--muted); font-size:.76rem; }
+    .shopping-photo-actions { display:flex; gap:6px; flex-wrap:wrap; margin-top:7px; }
+    .shopping-photo-actions button { padding:4px 8px; font-size:.75rem; }
+    .shopping-upload-hint { color:var(--muted); font-size:.76rem; }
     .shopping-row.done .shopping-row-name { color:#999184; text-decoration:line-through; }
     .shopping-delete { padding:4px 8px; font-size:.75rem; }
 
-    @media(max-width:520px) { .packing-list { grid-template-columns:1fr; } .expense-form { grid-template-columns:1fr; } .expense-form .wide { grid-column:auto; } .expense-table { font-size:.78rem; } .expense-table th,.expense-table td { padding:8px 4px; } }
+    @media(max-width:520px) { .packing-list { grid-template-columns:1fr; } .expense-summary { grid-template-columns:1fr 1fr; } .packing-add-form { flex-direction:column; } .expense-form { grid-template-columns:1fr; } .expense-form .wide { grid-column:auto; } .expense-table { font-size:.78rem; } .expense-table th,.expense-table td { padding:8px 4px; } }
 
   </style>
 </head>
@@ -305,15 +320,20 @@
         <div class="progress-meta"><span>打包進度</span><strong id="packingCount">0 / 0 已完成</strong></div>
         <div class="progress-track"><div class="progress-fill" id="packingProgress"></div></div>
         <div id="packingGroups"></div>
+        <form id="packingAddForm" class="packing-add-form">
+          <input id="packingNewItem" type="text" maxlength="60" placeholder="輸入想新增的物品，例如：暖暖包" aria-label="新增打包物品" required>
+          <button type="submit">＋ 新增物品</button>
+        </form>
       </div>
       <p class="note">小提醒：護照、信用卡、現金、手機與充電用品，出門前再確認一次。</p>
     </section>
 
     <section id="expensesPanel" class="page-panel" role="tabpanel" aria-label="旅行記帳">
       <h2 class="section-heading">旅行記帳</h2>
-      <p class="section-intro">以日圓（¥）記錄旅途支出，資料會自動保存在目前瀏覽器。可隨時新增或刪除紀錄。</p>
+      <p class="section-intro">可選擇日圓或台幣記錄支出，並標記現金、信用卡或 PayPay 付款方式；資料會自動保存在目前瀏覽器。</p>
       <div class="expense-summary">
-        <div class="expense-stat"><small>目前總支出（日圓）</small><strong id="totalJPY">¥0</strong></div>
+        <div class="expense-stat"><small>日圓總支出</small><strong id="totalJPY">¥0</strong></div>
+        <div class="expense-stat"><small>台幣總支出</small><strong id="totalTWD">NT$0</strong></div>
         <div class="expense-stat"><small>支出筆數</small><strong id="expenseCount">0 筆</strong></div>
       </div>
       <div class="panel-card">
@@ -322,14 +342,16 @@
           <label>日期<input type="date" id="expenseDate" required min="2026-12-06" max="2026-12-12" value="2026-12-06"></label>
           <label>分類<select id="expenseCategory"><option>餐飲</option><option>交通</option><option>購物</option><option>門票／娛樂</option><option>住宿</option><option>其他</option></select></label>
           <label class="wide">項目／備註<input type="text" id="expenseName" placeholder="例如：拉麵、車票、伴手禮" maxlength="60" required></label>
-          <label>金額（日圓）<input type="number" id="expenseAmount" min="1" step="1" placeholder="例如：1200" required></label>
+          <label>幣別<select id="expenseCurrency"><option value="JPY">日圓（¥）</option><option value="TWD">台幣（NT$）</option></select></label>
+          <label><span id="expenseAmountLabel">金額（日圓）</span><input type="number" id="expenseAmount" min="1" step="1" placeholder="例如：1200" required></label>
+          <label>付款方式<select id="expensePayment"><option value="現金">現金</option><option value="信用卡">信用卡</option><option value="PayPay">PayPay</option></select></label>
           <label>付款人（選填）<input type="text" id="expensePayer" placeholder="例如：我" maxlength="20"></label>
           <button class="wide" type="submit">＋ 新增支出</button>
         </form>
       </div>
       <div class="panel-card">
         <h3 style="margin:0 0 8px;font-size:1rem">支出明細</h3>
-        <div style="overflow-x:auto"><table class="expense-table"><thead><tr><th>日期／項目</th><th>分類</th><th style="text-align:right">金額</th><th></th></tr></thead><tbody id="expenseRows"></tbody></table></div>
+        <div style="overflow-x:auto"><table class="expense-table"><thead><tr><th>日期／項目</th><th>分類</th><th>付款方式</th><th style="text-align:right">金額</th><th></th></tr></thead><tbody id="expenseRows"></tbody></table></div>
         <div id="expenseEmpty" class="empty-state">目前還沒有記帳紀錄，新增第一筆旅費吧！</div>
       </div>
     </section>
@@ -341,6 +363,7 @@
         <form id="shoppingForm" class="expense-form">
           <label class="wide">想買的商品<input type="text" id="shoppingName" maxlength="100" placeholder="例如：吉伊卡哇周邊、藥妝、伴手禮" required></label>
           <label>備註／店家（選填）<input type="text" id="shoppingMemo" maxlength="100" placeholder="例如：原宿店、幫朋友代買"></label>
+          <label>商品圖片（選填）<input type="file" id="shoppingImage" accept="image/*"><span class="shopping-upload-hint">可上傳商品照片或截圖，會自動縮小後儲存</span></label>
           <button type="submit">＋ 加入清單</button>
         </form>
       </div>
@@ -409,7 +432,7 @@
       });
     });
 
-    // Packing list saved locally in this browser.
+    // Packing list: default items can be renamed, and custom items can be added/edited/deleted.
     const packingData = [
       { title:'重要證件與金錢', items:['護照','身分證／健保卡','機票與住宿資料','日幣現金','信用卡／金融卡','交通票券／預約資料'] },
       { title:'3C 與電子用品', items:['手機','手機充電器','行動電源','充電線','轉接頭','耳機','相機／記憶卡'] },
@@ -417,45 +440,101 @@
       { title:'隨身包與其他', items:['隨身小包','雨傘／折疊傘','口罩','衛生紙／濕紙巾','常備藥品','環保購物袋／摺疊袋','行李秤'] }
     ];
     const packingKey = 'tokyoTrip2026Packing';
-    let packed = {};
-    try { packed = JSON.parse(localStorage.getItem(packingKey) || '{}'); } catch(e) { packed = {}; }
+    const packingNamesKey = 'tokyoTrip2026PackingNames';
+    const customPackingKey = 'tokyoTrip2026CustomPacking';
+    let packed = {}, packingNames = {}, customPacking = [];
+    try { packed = JSON.parse(localStorage.getItem(packingKey) || '{}') || {}; } catch(e) { packed = {}; }
+    try { packingNames = JSON.parse(localStorage.getItem(packingNamesKey) || '{}') || {}; } catch(e) { packingNames = {}; }
+    try { customPacking = JSON.parse(localStorage.getItem(customPackingKey) || '[]'); if (!Array.isArray(customPacking)) customPacking = []; } catch(e) { customPacking = []; }
     const packingGroups = document.getElementById('packingGroups');
-    const allPackingItems = packingData.flatMap(group => group.items);
-    packingData.forEach((group, gi) => {
-      const section = document.createElement('section'); section.className = 'packing-group';
-      const heading = document.createElement('h3'); heading.textContent = group.title; section.appendChild(heading);
-      const list = document.createElement('div'); list.className = 'packing-list';
-      group.items.forEach((item, ii) => {
-        const id = gi + '-' + ii;
-        const label = document.createElement('label'); label.className = 'packing-item' + (packed[id] ? ' checked' : '');
-        const input = document.createElement('input'); input.type = 'checkbox'; input.checked = !!packed[id];
-        const span = document.createElement('span'); span.textContent = item;
-        input.addEventListener('change', () => {
-          packed[id] = input.checked; label.classList.toggle('checked', input.checked);
-          localStorage.setItem(packingKey, JSON.stringify(packed)); updatePackingProgress();
-        });
-        label.append(input, span); list.appendChild(label);
-      });
-      section.appendChild(list); packingGroups.appendChild(section);
-    });
-    function updatePackingProgress() {
-      const done = Object.values(packed).filter(Boolean).length;
-      const total = allPackingItems.length;
-      document.getElementById('packingCount').textContent = `${done} / ${total} 已完成`;
-      document.getElementById('packingProgress').style.width = `${total ? done/total*100 : 0}%`;
+    function savePackingState() {
+      localStorage.setItem(packingKey, JSON.stringify(packed));
+      localStorage.setItem(packingNamesKey, JSON.stringify(packingNames));
+      localStorage.setItem(customPackingKey, JSON.stringify(customPacking));
     }
-    updatePackingProgress();
+    function makePackingItem(id, originalName, isCustom=false) {
+      const name = isCustom ? originalName : (packingNames[id] || originalName);
+      const label = document.createElement('div');
+      label.className = 'packing-item' + (packed[id] ? ' checked' : '');
+      const input = document.createElement('input'); input.type = 'checkbox'; input.checked = !!packed[id];
+      input.setAttribute('aria-label', '完成：' + name);
+      const span = document.createElement('span'); span.className = 'packing-name'; span.textContent = name;
+      input.addEventListener('change', () => { packed[id] = input.checked; label.classList.toggle('checked', input.checked); savePackingState(); updatePackingProgress(); });
+      const actions = document.createElement('div'); actions.className = 'packing-actions';
+      const edit = document.createElement('button'); edit.type = 'button'; edit.textContent = '修改'; edit.setAttribute('aria-label','修改物品：'+name);
+      edit.addEventListener('click', () => {
+        const next = window.prompt('修改物品名稱', span.textContent);
+        if (next === null) return;
+        const clean = next.trim(); if (!clean) { window.alert('物品名稱不能空白喔！'); return; }
+        span.textContent = clean;
+        if (isCustom) { const item = customPacking.find(x => x.id === id); if (item) item.name = clean; }
+        else packingNames[id] = clean;
+        savePackingState(); updatePackingProgress();
+      });
+      actions.appendChild(edit);
+      if (isCustom) {
+        const del = document.createElement('button'); del.type = 'button'; del.textContent = '刪除';
+        del.addEventListener('click', () => { customPacking = customPacking.filter(x => x.id !== id); delete packed[id]; savePackingState(); renderPacking(); });
+        actions.appendChild(del);
+      }
+      label.append(input, span, actions);
+      return label;
+    }
+    function renderPacking() {
+      packingGroups.replaceChildren();
+      packingData.forEach((group, gi) => {
+        const section = document.createElement('section'); section.className = 'packing-group';
+        const heading = document.createElement('h3'); heading.textContent = group.title; section.appendChild(heading);
+        const list = document.createElement('div'); list.className = 'packing-list';
+        group.items.forEach((item, ii) => list.appendChild(makePackingItem(`${gi}-${ii}`, item)));
+        section.appendChild(list); packingGroups.appendChild(section);
+      });
+      const customSection = document.createElement('section'); customSection.className = 'packing-group';
+      const customHeading = document.createElement('h3'); customHeading.textContent = '我的自訂物品'; customSection.appendChild(customHeading);
+      const customList = document.createElement('div'); customList.className = 'packing-list';
+      customPacking.forEach(item => customList.appendChild(makePackingItem(item.id, item.name, true)));
+      customSection.appendChild(customList);
+      if (!customPacking.length) { const hint = document.createElement('p'); hint.className='section-intro'; hint.textContent='還沒有自訂物品，可以在下方自行新增。'; customSection.appendChild(hint); }
+      packingGroups.appendChild(customSection);
+      updatePackingProgress();
+    }
+    function updatePackingProgress() {
+      const defaultTotal = packingData.reduce((sum, group) => sum + group.items.length, 0);
+      const total = defaultTotal + customPacking.length;
+      const done = Object.values(packed).filter(Boolean).length;
+      document.getElementById('packingCount').textContent = `${done} / ${total} 已完成`;
+      document.getElementById('packingProgress').style.width = `${total ? Math.min(done,total)/total*100 : 0}%`;
+    }
+    document.getElementById('packingAddForm').addEventListener('submit', event => {
+      event.preventDefault();
+      const input = document.getElementById('packingNewItem'); const name = input.value.trim();
+      if (!name) return;
+      customPacking.push({id:'custom-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), name});
+      input.value = ''; savePackingState(); renderPacking(); input.focus();
+    });
+    renderPacking();
 
-    // Expense log saved locally in this browser.
+    // Expense log: supports JPY/TWD and payment methods; old records default to JPY.
     const expenseKey = 'tokyoTrip2026Expenses';
     let expenses = [];
     try { expenses = JSON.parse(localStorage.getItem(expenseKey) || '[]'); if (!Array.isArray(expenses)) expenses = []; } catch(e) { expenses = []; }
     const yen = value => '¥' + Number(value).toLocaleString('ja-JP');
+    const twd = value => 'NT$' + Number(value).toLocaleString('zh-TW');
+    const currencySelect = document.getElementById('expenseCurrency');
+    const amountLabel = document.getElementById('expenseAmountLabel');
+    const amountInput = document.getElementById('expenseAmount');
+    currencySelect.addEventListener('change', () => {
+      const isTWD = currencySelect.value === 'TWD';
+      amountLabel.textContent = isTWD ? '金額（台幣）' : '金額（日圓）';
+      amountInput.placeholder = isTWD ? '例如：350' : '例如：1200';
+    });
     function saveExpenses() { localStorage.setItem(expenseKey, JSON.stringify(expenses)); renderExpenses(); }
     function renderExpenses() {
       const tbody = document.getElementById('expenseRows'); tbody.replaceChildren();
-      const total = expenses.reduce((sum, item) => sum + Number(item.amount || 0), 0);
-      document.getElementById('totalJPY').textContent = yen(total);
+      const totalJPY = expenses.filter(item => (item.currency || 'JPY') === 'JPY').reduce((sum, item) => sum + Number(item.amount || 0), 0);
+      const totalTWD = expenses.filter(item => item.currency === 'TWD').reduce((sum, item) => sum + Number(item.amount || 0), 0);
+      document.getElementById('totalJPY').textContent = yen(totalJPY);
+      document.getElementById('totalTWD').textContent = twd(totalTWD);
       document.getElementById('expenseCount').textContent = expenses.length + ' 筆';
       document.getElementById('expenseEmpty').style.display = expenses.length ? 'none' : 'block';
       [...expenses].sort((a,b) => b.date.localeCompare(a.date)).forEach(item => {
@@ -463,25 +542,29 @@
         const detail = document.createElement('td');
         detail.textContent = item.date.slice(5).replace('-','/') + ' · ' + item.name + (item.payer ? '（'+item.payer+'）' : '');
         const category = document.createElement('td'); category.textContent = item.category;
-        const amount = document.createElement('td'); amount.className = 'amount'; amount.textContent = yen(item.amount);
+        const payment = document.createElement('td'); payment.className='expense-payment'; payment.textContent = item.payment || '現金';
+        const amount = document.createElement('td'); amount.className = 'amount'; amount.textContent = (item.currency === 'TWD' ? twd(item.amount) : yen(item.amount));
         const action = document.createElement('td');
         const del = document.createElement('button'); del.type = 'button'; del.className = 'delete-expense'; del.textContent = '刪除'; del.setAttribute('aria-label','刪除 '+item.name);
         del.addEventListener('click', () => { expenses = expenses.filter(x => x.id !== item.id); saveExpenses(); });
-        action.appendChild(del); tr.append(detail,category,amount,action); tbody.appendChild(tr);
+        action.appendChild(del); tr.append(detail,category,payment,amount,action); tbody.appendChild(tr);
       });
     }
     document.getElementById('expenseForm').addEventListener('submit', event => {
       event.preventDefault();
       const name = document.getElementById('expenseName').value.trim();
-      const amount = Number(document.getElementById('expenseAmount').value);
+      const amount = Number(amountInput.value);
       if (!name || !Number.isFinite(amount) || amount <= 0) return;
       expenses.push({
         id: (Date.now().toString(36) + Math.random().toString(36).slice(2,7)),
         date: document.getElementById('expenseDate').value,
         category: document.getElementById('expenseCategory').value,
-        name, amount: Math.round(amount), payer: document.getElementById('expensePayer').value.trim()
+        name, amount: Math.round(amount), currency:currencySelect.value,
+        payment:document.getElementById('expensePayment').value,
+        payer: document.getElementById('expensePayer').value.trim()
       });
-      event.target.reset(); document.getElementById('expenseDate').value = '2026-12-06'; saveExpenses();
+      event.target.reset(); document.getElementById('expenseDate').value = '2026-12-06';
+      currencySelect.value='JPY'; currencySelect.dispatchEvent(new Event('change')); saveExpenses();
     });
     renderExpenses();
 
@@ -503,16 +586,52 @@
         const main = document.createElement('div'); main.className = 'shopping-row-main';
         const name = document.createElement('div'); name.className = 'shopping-row-name'; name.textContent = item.name; main.appendChild(name);
         if (item.memo) { const memo = document.createElement('div'); memo.className = 'shopping-row-memo'; memo.textContent = item.memo; main.appendChild(memo); }
+        if (item.image) {
+          const photo = document.createElement('img'); photo.className = 'shopping-photo'; photo.src = item.image; photo.alt = item.name + ' 商品圖片';
+          photo.addEventListener('click', () => window.open(item.image, '_blank')); main.appendChild(photo);
+        }
+        const actions = document.createElement('div'); actions.className = 'shopping-photo-actions';
+        const changePhoto = document.createElement('button'); changePhoto.type = 'button'; changePhoto.textContent = item.image ? '更換圖片' : '新增圖片';
+        const photoInput = document.createElement('input'); photoInput.type = 'file'; photoInput.accept = 'image/*'; photoInput.hidden = true;
+        changePhoto.addEventListener('click', () => photoInput.click());
+        photoInput.addEventListener('change', async () => { const file = photoInput.files && photoInput.files[0]; if (!file) return; try { item.image = await compressShoppingImage(file); saveShopping(); } catch(e) { alert('圖片處理失敗，請換一張圖片再試一次。'); } });
+        actions.append(changePhoto, photoInput);
+        if (item.image) { const removePhoto = document.createElement('button'); removePhoto.type = 'button'; removePhoto.textContent = '移除圖片'; removePhoto.addEventListener('click', () => { delete item.image; saveShopping(); }); actions.appendChild(removePhoto); }
+        main.appendChild(actions);
         const del = document.createElement('button'); del.type = 'button'; del.className = 'shopping-delete'; del.textContent = '刪除'; del.addEventListener('click', () => { shoppingItems = shoppingItems.filter(x => x.id !== item.id); saveShopping(); });
         row.append(check, main, del); shoppingList.appendChild(row);
       });
     }
-    document.getElementById('shoppingForm').addEventListener('submit', event => {
+    function compressShoppingImage(file) {
+      return new Promise((resolve, reject) => {
+        if (!file.type.startsWith('image/')) { reject(new Error('not image')); return; }
+        const reader = new FileReader();
+        reader.onerror = reject;
+        reader.onload = () => {
+          const img = new Image(); img.onerror = reject;
+          img.onload = () => {
+            const maxSide = 900, scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+            const canvas = document.createElement('canvas'); canvas.width = Math.round(img.width * scale); canvas.height = Math.round(img.height * scale);
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', 0.76));
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    document.getElementById('shoppingForm').addEventListener('submit', async event => {
       event.preventDefault();
       const name = document.getElementById('shoppingName').value.trim();
       const memo = document.getElementById('shoppingMemo').value.trim();
+      const imageFile = document.getElementById('shoppingImage').files[0];
       if (!name) return;
-      shoppingItems.push({id:Date.now().toString(36) + Math.random().toString(36).slice(2,7), name, memo, done:false});
+      let image = '';
+      if (imageFile) {
+        try { image = await compressShoppingImage(imageFile); }
+        catch(e) { alert('圖片處理失敗，請換一張圖片再試一次。'); return; }
+      }
+      shoppingItems.push({id:Date.now().toString(36) + Math.random().toString(36).slice(2,7), name, memo, image, done:false});
       event.target.reset(); saveShopping();
     });
     renderShopping();
