@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#e8dfd1" />
+  <title>｜東京 7 天 6 夜</title>
+<style>
+    :root {
+      --wood: #a7835c;
+      --wood-dark: #71563d;
+      --sand: #e8dfd1;
+      --cream: #f7f4ee;
+      --paper: #fffdf8;
+      --ink: #38352f;
+      --muted: #81796d;
+      --sage: #8b9782;
+      --sage-light: #e8ece3;
+      --line: #e7dfd2;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--cream);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+      line-height: 1.75;
+      letter-spacing: .015em;
+    }
+    a { color: var(--wood-dark); text-decoration: none; font-weight: 600; }
+    a:hover { text-decoration: underline; }
+
+    .hero {
+      position: relative;
+      display: flex;
+      min-height: clamp(340px, 62vh, 620px);
+      overflow: hidden;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: flex-start;
+      padding: clamp(32px, 7vw, 76px);
+      text-align: left;
+      color: #fff;
+      background: linear-gradient(0deg, rgba(30, 35, 31, .48), rgba(30, 35, 31, .02) 65%), url("cover-tokyo.jpg") center 48% / cover no-repeat;
+      border-bottom: 1px solid #d8cebf;
+    }
+    .hero:before, .hero:after { display: none; }
+    .eyebrow {
+      display: inline-block;
+      padding: 4px 12px;
+      border: 1px solid #ffffffb0;
+      border-radius: 2px;
+      color: #fff;
+      font-size: .75rem;
+      letter-spacing: .18em;
+    }
+    h1 {
+      margin: 16px 0 7px;
+      font-family: "Noto Serif TC", "Songti TC", serif;
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-weight: 500;
+      line-height: 1.25;
+      letter-spacing: .12em;
+    }
+    .hero p { margin: 0; font-size: .98rem; color: #fff; }
+    .hero .sub { margin-top: 10px; color: #ffffffdf; font-size: .86rem; }
+    @media (max-width: 600px) {
+      .hero { min-height: 420px; padding: 30px 24px 38px; background-position: 58% center; }
+    }
+
+    .wrap { width: min(900px, calc(100% - 30px)); margin: 28px auto 60px; }
+    .toolbar {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 12px; flex-wrap: wrap; margin: 0 0 16px;
+    }
+    .note { color: var(--muted); font-size: .85rem; }
+    button {
+      border: 1px solid #cfc3b2; border-radius: 3px; padding: 9px 15px;
+      background: #e7dfd2; color: var(--ink); font: inherit;
+      font-size: .85rem; font-weight: 600; cursor: pointer;
+      transition: background .18s ease;
+    }
+    button:hover { background: #d9cebd; }
+
+    .day {
+      margin: 13px 0; overflow: hidden; background: var(--paper);
+      border: 1px solid #e4dbce; border-radius: 5px;
+      box-shadow: 0 3px 12px #4a40300a;
+    }
+    .day summary {
+      display: flex; align-items: center; gap: 15px; padding: 18px 20px;
+      cursor: pointer; list-style: none; background: #fbf9f4;
+    }
+    .day summary::-webkit-details-marker { display: none; }
+    .day summary:after {
+      content: "+"; display: grid; place-items: center; margin-left: auto;
+      flex: 0 0 28px; width: 28px; height: 28px; border: 1px solid #d9cdbb;
+      border-radius: 50%; color: var(--wood-dark); font-size: 1rem; font-weight: 400;
+    }
+    .day[open] summary:after { content: "−"; background: var(--sage-light); border-color: #cbd3c4; color: #59634f; }
+    .day-number {
+      display: grid; place-items: center; flex: 0 0 52px; width: 52px; height: 52px;
+      border: 1px solid #c9b69e; border-radius: 3px; background: #e7dfd2;
+      color: var(--wood-dark); font-size: .76rem; font-weight: 700; line-height: 1.25;
+      text-align: center; letter-spacing: .04em;
+    }
+    .day:nth-of-type(3n) .day-number { background: #e5e9df; border-color: #c9d1c1; color: #59634f; }
+    .day:nth-of-type(3n + 1) .day-number { background: #f0e8dc; border-color: #d9c9b5; color: #72583e; }
+    .day-title { font-weight: 700; font-size: 1.03rem; }
+    .day-date { color: var(--muted); font-size: .8rem; }
+    .day-content { padding: 8px 22px 22px 25px; border-top: 1px solid #f0ebe2; }
+    .timeline { position: relative; margin-left: 8px; padding-left: 23px; border-left: 1px solid #d8cbbb; }
+    .item { position: relative; padding: 11px 0 14px; }
+    .item:before {
+      content: ""; position: absolute; left: -29px; top: 21px; width: 9px; height: 9px;
+      border: 2px solid var(--paper); border-radius: 50%; background: var(--sage);
+      box-shadow: 0 0 0 1px #aab29f;
+    }
+    .time { display: inline-block; margin-bottom: 3px; color: var(--wood-dark); font-size: .8rem; font-weight: 700; letter-spacing: .04em; }
+    .item h3 { display: inline; margin: 0; font-size: .98rem; font-weight: 700; }
+    .item p { margin: 4px 0 0; color: #746e64; font-size: .9rem; }
+    .map-link { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; font-size: .83rem; }
+    .tag { display: inline-block; margin-left: 6px; padding: 1px 7px; border: 1px solid #cbd3c4; border-radius: 2px; background: #edf0e9; color: #59634f; font-size: .7rem; font-weight: 600; vertical-align: 2px; }
+    .todo { padding: 14px 16px; border: 1px dashed #d8cbbb; border-radius: 3px; background: #fbf9f4; color: var(--muted); font-size: .9rem; }
+    .footer { padding: 24px 8px; color: var(--muted); font-size: .8rem; text-align: center; }
+    .footer strong { color: var(--wood-dark); }
+
+    @media (min-width: 700px) {
+      .wrap { margin-top: 34px; }
+      .day summary { padding: 20px 24px; }
+      .day-content { padding: 8px 30px 24px 32px; }
+      .day-title { font-size: 1.1rem; }
+      .item h3 { font-size: 1.02rem; }
+    }
+    @media (max-width: 380px) {
+      .day summary { gap: 10px; padding: 13px 11px; }
+      .day-number { flex-basis: 46px; width: 46px; height: 46px; }
+      .day-title { font-size: .93rem; }
+      .day-date { font-size: .72rem; }
+      .day-content { padding-right: 12px; padding-left: 17px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *:before, *:after { transition: none !important; }
+    }
+
+    /* Individual itinerary stop cards and editable notes */
+    .timeline { margin:0; padding:0; border:0; }
+    .item { margin:12px 0; padding:16px 17px; border:1px solid var(--line); border-radius:4px; background:#fffdf9; box-shadow:0 2px 8px #4a403008; }
+    .item:before { display:none; }
+    .item h3 { display:block; margin:2px 0 4px; }
+    .itinerary-note { margin-top:13px; padding-top:11px; border-top:1px dashed #ded5c8; }
+    .itinerary-note label { display:block; margin-bottom:5px; color:var(--wood-dark); font-size:.8rem; font-weight:700; }
+    .itinerary-note textarea { display:block; width:100%; min-height:62px; resize:vertical; padding:10px 11px; border:1px solid #ded6ca; border-radius:3px; outline:none; background:#fbf9f4; color:var(--ink); font:inherit; font-size:.88rem; line-height:1.55; }
+    .itinerary-note textarea:focus { border-color:var(--sage); box-shadow:0 0 0 2px #8b97821c; }
+    @media(max-width:520px) { .item { padding:13px 12px; } }
+
+    /* Travel planner pages */
+    .page-nav { display:flex; gap:8px; overflow-x:auto; padding:4px 2px 12px; margin:0 0 16px; scrollbar-width:thin; }
+    .page-tab { flex:0 0 auto; min-width:76px; padding:10px 14px; border:1px solid var(--line); border-radius:3px; background:#fbf9f4; color:var(--muted); }
+    .page-tab[aria-selected="true"] { background:var(--wood-dark); border-color:var(--wood-dark); color:#fff; }
+    .page-panel { display:none; }
+    .page-panel.active { display:block; }
+    .section-heading { margin:8px 0 4px; font-family:"Noto Serif TC",serif; font-size:1.45rem; font-weight:500; }
+    .section-intro { margin:0 0 18px; color:var(--muted); font-size:.88rem; }
+    .day-picker { display:flex; gap:7px; overflow-x:auto; padding:2px 0 14px; }
+    .day-picker button { min-width:58px; padding:8px 10px; background:#fbf9f4; }
+    .day-picker button.active { background:var(--sage-light); border-color:#b9c4ae; color:#4f5d48; }
+    .day[hidden] { display:none !important; }
+    .panel-card { padding:18px; margin:12px 0; border:1px solid var(--line); border-radius:4px; background:var(--paper); }
+    .packing-group { margin:16px 0 20px; }
+    .packing-group h3 { margin:0 0 9px; color:var(--wood-dark); font-size:1rem; }
+    .packing-list { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+    .packing-item { display:flex; align-items:flex-start; gap:9px; padding:10px 11px; border:1px solid #eee8de; border-radius:3px; background:#fcfaf6; font-size:.9rem; }
+    .packing-item input { width:17px; height:17px; margin:4px 0 0; accent-color:var(--sage); flex:0 0 auto; }
+    .packing-item.checked .packing-name { color:#999184; text-decoration:line-through; }
+    .packing-item { align-items:center; }
+    .packing-name { flex:1; min-width:0; overflow-wrap:anywhere; }
+    .packing-actions { display:flex; gap:4px; margin-left:auto; }
+    .packing-actions button { padding:3px 7px; font-size:.72rem; white-space:nowrap; }
+    .packing-add-form { display:flex; gap:8px; margin:14px 0 4px; }
+    .packing-add-form input,.packing-add-form select { min-width:0; padding:9px 11px; border:1px solid #d9d0c4; border-radius:3px; background:#fffdf8; color:var(--ink); font:inherit; }
+    .packing-add-form input { flex:1; }
+    .packing-add-form select { flex:0 1 190px; }
+    .packing-add-form button { padding:8px 12px; white-space:nowrap; }
+    .expense-edit-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; padding:12px; background:#f8f5ee; border:1px solid var(--line); border-radius:3px; }
+    .expense-edit-form label { display:flex; flex-direction:column; gap:4px; color:var(--muted); font-size:.76rem; }
+    .expense-edit-form input,.expense-edit-form select { width:100%; min-width:0; padding:8px; border:1px solid #d9d0c4; border-radius:3px; background:#fffdf8; color:var(--ink); font:inherit; font-size:.85rem; }
+    .expense-edit-form .wide { grid-column:1/-1; }
+    .expense-edit-actions { display:flex; gap:8px; grid-column:1/-1; }
+    .expense-edit-actions button { padding:7px 12px; }
+    .progress-track { height:7px; overflow:hidden; background:#eee8de; border-radius:20px; }
+    .progress-fill { height:100%; width:0; background:var(--sage); transition:width .2s; }
+    .progress-meta { display:flex; justify-content:space-between; margin:8px 0 5px; color:var(--muted); font-size:.82rem; }
+    .expense-form { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .expense-form label { display:flex; flex-direction:column; gap:5px; color:var(--muted); font-size:.82rem; }
+    .expense-form input,.expense-form select { width:100%; min-width:0; padding:10px; border:1px solid #d9d0c4; border-radius:3px; background:#fffdf8; color:var(--ink); font:inherit; font-size:.92rem; }
+    .expense-form .wide { grid-column:1/-1; }
+    .expense-summary { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:10px; margin:14px 0; }
+    .expense-stat { padding:13px; background:#f4f0e8; border:1px solid var(--line); border-radius:3px; }
+    .expense-stat small { display:block; color:var(--muted); font-size:.78rem; }
+    .expense-stat strong { display:block; margin-top:3px; font-size:1.25rem; color:var(--wood-dark); }
+    .expense-table { width:100%; border-collapse:collapse; font-size:.86rem; }
+    .expense-table th,.expense-table td { padding:9px 6px; border-bottom:1px solid var(--line); text-align:left; }
+    .expense-table th { color:var(--muted); font-weight:600; }
+    .expense-table td.amount { text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    .delete-expense { padding:4px 8px; font-size:.75rem; }
+    .expense-table td { vertical-align:top; }
+    .expense-table td.amount { text-align:right; white-space:nowrap; font-variant-numeric:tabular-nums; }
+    .expense-payment { color:var(--muted); font-size:.78rem; white-space:nowrap; }
+    .empty-state { padding:20px 8px; color:var(--muted); text-align:center; font-size:.88rem; }
+
+    .itinerary-field { margin-top:12px; }
+    .itinerary-field label { display:block; margin-bottom:5px; color:var(--wood-dark); font-size:.8rem; font-weight:700; }
+    .itinerary-field input, .itinerary-field textarea { display:block; width:100%; min-height:42px; padding:9px 11px; border:1px solid #ded6ca; border-radius:3px; outline:none; background:#fbf9f4; color:var(--ink); font:inherit; font-size:.88rem; line-height:1.55; }
+    .itinerary-field textarea { min-height:62px; resize:vertical; }
+    .itinerary-field input:focus, .itinerary-field textarea:focus { border-color:var(--sage); box-shadow:0 0 0 2px #8b97821c; }
+    .shopping-list { display:grid; gap:9px; }
+    .shopping-category { margin:18px 0 8px; color:var(--wood-dark); font-size:1rem; font-weight:700; }
+    .shopping-category:first-child { margin-top:4px; }
+    .shopping-category-count { margin-left:7px; color:var(--muted); font-size:.76rem; font-weight:400; }
+    .shopping-category-form { display:flex; gap:8px; align-items:end; flex-wrap:wrap; margin:0 0 14px; padding:12px; background:#fbf9f4; border:1px dashed var(--line); }
+    .shopping-category-form label { display:flex; flex-direction:column; gap:4px; flex:1; min-width:170px; color:var(--muted); font-size:.8rem; }
+    .shopping-category-form input,.shopping-form-select { width:100%; min-width:0; padding:10px; border:1px solid #d9d0c4; border-radius:3px; background:#fffdf8; color:var(--ink); font:inherit; font-size:.92rem; }
+    .shopping-category-form button { white-space:nowrap; }
+    .shopping-row { display:flex; align-items:flex-start; gap:10px; padding:12px; border:1px solid #eee8de; border-radius:3px; background:#fcfaf6; }
+    .shopping-row input[type=checkbox] { width:18px; height:18px; margin:4px 0 0; accent-color:var(--sage); flex:0 0 auto; }
+    .shopping-row-main { flex:1; min-width:0; }
+    .shopping-row-name { font-weight:600; overflow-wrap:anywhere; }
+    .shopping-row-memo { color:var(--muted); font-size:.8rem; overflow-wrap:anywhere; }
+    .shopping-photo { display:block; width:92px; height:92px; margin-top:9px; object-fit:cover; border-radius:3px; border:1px solid var(--line); cursor:pointer; }
+    .shopping-photo-empty { margin-top:8px; color:var(--muted); font-size:.76rem; }
+    .shopping-photo-actions { display:flex; gap:6px; flex-wrap:wrap; margin-top:7px; }
+    .shopping-photo-actions button { padding:4px 8px; font-size:.75rem; }
+    .shopping-upload-hint { color:var(--muted); font-size:.76rem; }
+    .shopping-row.done .shopping-row-name { color:#999184; text-decoration:line-through; }
+    .shopping-delete { padding:4px 8px; font-size:.75rem; }
+
+    @media(max-width:520px) { .packing-list { grid-template-columns:1fr; } .expense-summary { grid-template-columns:1fr 1fr; } .packing-add-form { flex-direction:column; } .expense-form { grid-template-columns:1fr; } .expense-form .wide { grid-column:auto; } .expense-table { font-size:.78rem; } .expense-table th,.expense-table td { padding:8px 4px; } }
+
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <span class="eyebrow">TOKYO TRIP</span>
+    <h1>2026 東京</h1>
+    <p>日本東京 7 天 6 夜</p>
+    <div class="sub">12/6 — 12/12</div>
+  </header>
+
+  <main class="wrap">
+    <div class="panel-card" style="font-size:.85rem"><span id="syncStatus" role="status">正在連接雲端…</span> <button id="syncNow" type="button">立即同步</button></div>
+    <nav class="page-nav" aria-label="旅行功能分頁" role="tablist">
+      <button class="page-tab" role="tab" aria-selected="true" data-page="itinerary">行程</button>
+      <button class="page-tab" role="tab" aria-selected="false" data-page="packing">行李打包</button>
+      <button class="page-tab" role="tab" aria-selected="false" data-page="expenses">旅行記帳</button>
+      <button class="page-tab" role="tab" aria-selected="false" data-page="shopping">待購物清單</button>
+    </nav>
+    <section id="itineraryPanel" class="page-panel active" role="tabpanel">
+      <div class="toolbar">
+        <div class="note">📍 點選日期切換每日行程；每個景點都有獨立備註欄，可直接填寫。</div>
+      </div>
+      <nav class="day-picker" aria-label="每日行程日期">
+        <button type="button" class="active" data-day="1" aria-pressed="true">DAY 1</button>
+        <button type="button" data-day="2" aria-pressed="false">DAY 2</button>
+        <button type="button" data-day="3" aria-pressed="false">DAY 3</button>
+        <button type="button" data-day="4" aria-pressed="false">DAY 4</button>
+        <button type="button" data-day="5" aria-pressed="false">DAY 5</button>
+        <button type="button" data-day="6" aria-pressed="false">DAY 6</button>
+        <button type="button" data-day="7" aria-pressed="false">DAY 7</button>
+      </nav>
+<details class="day" data-day-page="1" open>
+      <summary><span class="day-number">DAY<br>01</span><span><span class="day-title">出發！抵達東京</span><br><span class="day-date">12/6（日）｜桃園 → 成田 → 上野</span></span></summary>
+      <div class="day-content"><div class="timeline">
+        <section class="item"><span class="time">13:00</span><h3>抵達桃園機場第一航廈</h3><p>辦理報到、托運行李與出境手續。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=桃園國際機場第一航廈" target="_blank" rel="noopener">📍 Google 地圖：桃園機場第一航廈 ↗</a></section>
+        <section class="item"><span class="time">15:35</span><h3>台灣虎航 IT202｜TPE → NRT</h3><p>第一航廈出發，航班表定 19:35 抵達東京成田機場。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=成田國際機場" target="_blank" rel="noopener">📍 Google 地圖：成田國際機場 ↗</a></section>
+        <section class="item"><span class="time">約 20:30</span><h3>搭乘 Skyliner 前往市區</h3><p>此為預估時間，請依實際入境、領行李及車票狀況調整。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=京成電鐵Skyliner+成田機場" target="_blank" rel="noopener">🚆 Google 地圖：Skyliner 成田機場 ↗</a></section>
+        <section class="item"><span class="time">晚上</span><h3>入住 the tourist hotel（秋葉原）</h3><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=the+tourist+hotel+akihabara" target="_blank" rel="noopener">🏨 Google 地圖：the tourist hotel ↗</a></section>
+        <section class="item"><span class="time">宵夜</span><h3>一蘭 アトレ上野山下口店</h3><p>抵達東京的第一碗拉麵！</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=一蘭+アトレ上野山下口店" target="_blank" rel="noopener">🍜 Google 地圖：一蘭上野山下口店 ↗</a></section>
+      </div></div>
+    </details>
+
+    <details class="day" data-day-page="2" open>
+      <summary><span class="day-number">DAY<br>02</span><span><span class="day-title">東京市區散策・MAPPA 朝聖</span><br><span class="day-date">12/7（一）｜美食、東京車站、有樂町、神保町</span></span></summary>
+      <div class="day-content"><div class="timeline">
+        <section class="item"><span class="time">早午餐</span><h3>BUTTER 美瑛放牧酪農場／根室花丸壽司</h3><p>兩間擇一，出發前可再確認分店、營業時間與排隊狀況。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=BUTTER+美瑛放牧酪農場+東京" target="_blank" rel="noopener">🥞 Google 地圖：BUTTER 美瑛放牧酪農場 ↗</a><br><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=根室花まる+東京" target="_blank" rel="noopener">🍣 Google 地圖：根室花丸壽司 ↗</a></section>
+        <section class="item"><span class="time">上午</span><h3>東京車站逛逛</h3><p>車站商店、伴手禮與周邊街區自由散策。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=東京車站" target="_blank" rel="noopener">📍 Google 地圖：東京車站 ↗</a></section>
+        <section class="item"><span class="time">咖啡時間</span><h3>Tully’s Coffee</h3><p>途中找一間順路的分店休息。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Tully%27s+Coffee+東京車站" target="_blank" rel="noopener">☕ Google 地圖：Tully’s Coffee（東京車站周邊）↗</a></section>
+        <section class="item"><span class="time">14:00</span><h3>MAPPA EXPO 15th Anniversary <span class="tag">已預約</span></h3><p>地點：有樂町美術館。建議預留交通與入場時間。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=有楽町マリオン+有楽町美術館" target="_blank" rel="noopener">🎨 Google 地圖：有樂町美術館／有樂町一帶 ↗</a></section>
+        <section class="item"><span class="time">之後</span><h3>THE ジャンプショップ 神保町</h3><p>動漫周邊巡禮。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=THE+ジャンプショップ+神保町" target="_blank" rel="noopener">🛍️ Google 地圖：JUMP SHOP 神保町 ↗</a></section>
+        <section class="item"><span class="time">有空再去</span><h3>上野 HATCOFFEE</h3><p>可視當天時間與體力彈性安排。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=HATCOFFEE+上野" target="_blank" rel="noopener">☕ Google 地圖：HATCOFFEE 上野 ↗</a></section>
+        <section class="item"><span class="time">晚餐</span><h3>稻庭烏龍麵金子半之助</h3><p>晚餐二選一，依當天所在位置決定比較順路的店。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=稲庭うどん+東京" target="_blank" rel="noopener">🍜 Google 地圖：稻庭烏龍麵（東京）↗</a><br><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=金子半之助+東京" target="_blank" rel="noopener">🍤 Google 地圖：金子半之助（東京）↗</a></section>
+        <section class="item"><span class="time">晚上</span><h3>東京車站逛逛 → 回飯店</h3><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=the+tourist+hotel+akihabara" target="_blank" rel="noopener">🏨 Google 地圖：the tourist hotel ↗</a></section>
+      </div></div>
+    </details>
+
+    <details class="day" data-day-page="3" open><summary><span class="day-number">DAY<br>03</span><span><span class="day-title">新宿・原宿・澀谷動漫美食巡禮</span><br><span class="day-date">12/8（二）｜早餐、海賊王、吉伊卡哇</span></span></summary><div class="day-content"><div class="timeline">
+      <section class="item"><span class="time">早餐</span><h3>新宿 eggslut</h3><p>享用早餐，出發前可確認分店營業時間。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=eggslut+新宿" target="_blank" rel="noopener">🍳 Google 地圖：eggslut 新宿 ↗</a></section>
+      <section class="item"><span class="time">11:00</span><h3> ONE PIECE BASE SHOP</h3><p>海賊王官方商店巡禮。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=ONE+PIECE+BASE+SHOP+新宿丸井" target="_blank" rel="noopener">🏴‍☠️ Google 地圖：ONE PIECE BASE SHOP ↗</a></section>
+      <section class="item"><span class="time">午餐</span><h3>新宿檸檬牛舌</h3><p>新宿吃牛舌，店名與分店可再確認。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=檸檬牛たん+新宿" target="_blank" rel="noopener">🥩 Google 地圖：新宿檸檬牛舌 ↗</a></section>
+      <section class="item"><span class="time">下午</span><h3>原宿・吉伊卡哇麵包店</h3><p>前往吉伊卡哇主題麵包店，建議事先確認預約或入店規則。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=ちいかわベーカリー+原宿" target="_blank" rel="noopener">🥐 Google 地圖：吉伊卡哇麵包店 ↗</a></section>
+      <section class="item"><span class="time">下午茶</span><h3>澀谷 Kenyan 奶茶</h3><p>在澀谷喝杯奶茶休息一下。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Kenyan+紅茶+渋谷" target="_blank" rel="noopener">🧋 Google 地圖：Kenyan 奶茶 ↗</a></section>
+      <section class="item"><span class="time">晚餐</span><h3>敘敘苑 東京歌劇城 53F 店</h3><p>預計於東京歌劇城高樓層享用燒肉晚餐。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=叙々苑+東京オペラシティ53F店" target="_blank" rel="noopener">🥩 Google 地圖：敘敘苑 東京歌劇城 53F 店 ↗</a></section>
+    </div></div></details>
+    <details class="day" data-day-page="4" open><summary><span class="day-number">DAY<br>04</span><span><span class="day-title">咖啡・神宮・六本木冬季點燈</span><br><span class="day-date">12/9（三）｜東京市區 → 幕張豐砂</span></span></summary><div class="day-content"><div class="timeline">
+      <section class="item"><span class="time">早上</span><h3>Fuglen Tokyo</h3><p>從咖啡開始一天。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Fuglen+Tokyo" target="_blank" rel="noopener">☕ Google 地圖：Fuglen Tokyo ↗</a></section>
+      <section class="item"><span class="time">上午</span><h3>明治神宮</h3><p>在森林參道散步、參拜。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=明治神宮" target="_blank" rel="noopener">⛩️ Google 地圖：明治神宮 ↗</a></section>
+      <section class="item"><span class="time">下午</span><h3>國立新美術館</h3><p>可依當期展覽安排參觀。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=国立新美術館" target="_blank" rel="noopener">🖼️ Google 地圖：國立新美術館 ↗</a></section>
+      <section class="item"><span class="time">傍晚</span><h3>六本木點燈</h3><p>欣賞冬季燈飾；實際展區與點燈時間請以當年度公告為準。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=六本木+イルミネーション" target="_blank" rel="noopener">✨ Google 地圖：六本木點燈 ↗</a></section>
+      <section class="item"><span class="time">晚餐</span><h3>Ginza Lion Beer Hall</h3><p>晚餐安排在銀座啤酒餐廳。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=銀座ライオン+ビヤホール+銀座" target="_blank" rel="noopener">🍺 Google 地圖：Ginza Lion Beer Hall ↗</a></section>
+      <section class="item"><span class="time">晚上</span><h3>前往 JR 東日本飯店幕張豐砂・Check-in</h3><p>當晚更換住宿，建議預留市區前往幕張豐砂的交通時間。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=JR東日本ホテルメッツ+プレミア+幕張豊砂" target="_blank" rel="noopener">🏨 Google 地圖：JR 東日本飯店幕張豐砂 ↗</a></section>
+    </div></div></details>
+    <details class="day" data-day-page="5" open><summary><span class="day-number">DAY<br>05</span><span><span class="day-title">東京迪士尼海洋</span><br><span class="day-date">12/10（四）｜一整天玩樂</span></span></summary><div class="day-content"><div class="timeline">
+      <section class="item"><span class="time">全天</span><h3>東京迪士尼海洋 Tokyo DisneySea</h3><p>建議事先確認入園時間、門票、園區營運資訊與想玩的設施，並依當天體力安排休息。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=Tokyo+DisneySea" target="_blank" rel="noopener">🎢 Google 地圖：東京迪士尼海洋 ↗</a></section>
+      <section class="item"><span class="time">晚上</span><h3>返回幕張豐砂住宿</h3><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=JR東日本ホテルメッツ+プレミア+幕張豊砂" target="_blank" rel="noopener">🏨 Google 地圖：JR 東日本飯店幕張豐砂 ↗</a></section>
+    </div></div></details>
+    <details class="day" data-day-page="6" open><summary><span class="day-number">DAY<br>06</span><span><span class="day-title">Tokyo Comic Con・吉伊卡哇聖誕市集</span><br><span class="day-date">12/11（五）｜幕張展覽館</span></span></summary><div class="day-content"><div class="timeline">
+      <section class="item"><span class="time">11:00–19:00</span><h3>Tokyo Comic Con 2026｜幕張展覽館</h3><p>官方目前公布 12/11（五）活動時間為 11:00–19:00，實際安排仍請以官方公告為準。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=幕張メッセ" target="_blank" rel="noopener">🎬 Google 地圖：幕張展覽館 ↗</a><br><a class="map-link" href="https://tokyocomiccon.jp/" target="_blank" rel="noopener">🔗 Tokyo Comic Con 官方網站 ↗</a></section>
+      <section class="item"><span class="time">另行安排</span><h3>吉伊卡哇耶誕市集</h3><p>市集地點與當日營業時間尚待確認，建議出發前查閱官方最新公告，並預留前往市集的交通時間。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=ちいかわ+クリスマスマーケット+東京" target="_blank" rel="noopener">🎄 Google 地圖：吉伊卡哇耶誕市集搜尋 ↗</a></section>
+      <section class="item"><span class="time">晚上</span><h3>返回幕張豐砂住宿</h3><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=JR東日本ホテルメッツ+プレミア+幕張豊砂" target="_blank" rel="noopener">🏨 Google 地圖：JR 東日本飯店幕張豐砂 ↗</a></section>
+    </div></div></details>
+    <details class="day" data-day-page="7" open><summary><span class="day-number">DAY<br>07</span><span><span class="day-title">回台灣・旅程完結</span><br><span class="day-date">12/12（六）｜幕張豐砂 → 成田 → 桃園</span></span></summary><div class="day-content"><div class="timeline">
+      <section class="item"><span class="time">出發前</span><h3>退房・前往成田機場</h3><p>建議預留充足的交通、報到與出境時間，並再次確認航廈與行李規定。</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=成田国際空港" target="_blank" rel="noopener">✈️ Google 地圖：成田國際機場 ↗</a></section>
+      <section class="item"><span class="time">18:30</span><h3>台灣虎航回程航班起飛</h3><p>成田機場出發，航班表定 21:50 抵達桃園機場。</p></section>
+      <section class="item"><span class="time">21:50</span><h3>抵達桃園機場</h3><p>宅宅之旅圓滿結束！</p><a class="map-link" href="https://www.google.com/maps/search/?api=1&query=桃園國際機場第一航廈" target="_blank" rel="noopener">🏠 Google 地圖：桃園國際機場 ↗</a></section>
+    </div></div></details>
+
+    </section>
+
+    <section id="packingPanel" class="page-panel" role="tabpanel" aria-label="行李打包">
+      <h2 class="section-heading">行李打包清單</h2>
+      <p class="section-intro">出發前慢慢確認，勾選狀態會保存在裝置，並在連線時同步。</p>
+      <div class="panel-card">
+        <div class="progress-meta"><span>打包進度</span><strong id="packingCount">0 / 0 已完成</strong></div>
+        <div class="progress-track"><div class="progress-fill" id="packingProgress"></div></div>
+        <div id="packingGroups"></div>
+        <form id="packingAddForm" class="packing-add-form">
+          <input id="packingNewItem" type="text" maxlength="60" placeholder="輸入想新增的物品，例如：暖暖包" aria-label="新增打包物品" required>
+          <select id="packingNewCategory" aria-label="選擇物品分類">
+            <option value="0">重要證件與金錢</option>
+            <option value="1">3C 與電子用品</option>
+            <option value="2">衣物與個人用品</option>
+            <option value="3">隨身包與其他</option>
+          </select>
+          <button type="submit">＋ 新增物品</button>
+        </form>
+      </div>
+      <p class="note">小提醒：護照、信用卡、現金、手機與充電用品，出門前再確認一次。</p>
+    </section>
+
+    <section id="expensesPanel" class="page-panel" role="tabpanel" aria-label="旅行記帳">
+      <h2 class="section-heading">旅行記帳</h2>
+      <p class="section-intro">可選擇日圓或台幣記錄支出，並標記現金、信用卡或 PayPay 付款方式；資料會保存在裝置，並在連線時同步。</p>
+      <div class="expense-summary">
+        <div class="expense-stat"><small>日圓總支出</small><strong id="totalJPY">¥0</strong></div>
+        <div class="expense-stat"><small>台幣總支出</small><strong id="totalTWD">NT$0</strong></div>
+        <div class="expense-stat"><small>支出筆數</small><strong id="expenseCount">0 筆</strong></div>
+      </div>
+      <div class="panel-card">
+        <h3 style="margin:0 0 12px;font-size:1rem">新增一筆支出</h3>
+        <form id="expenseForm" class="expense-form">
+          <label>日期<input type="date" id="expenseDate" required min="2026-12-06" max="2026-12-12" value="2026-12-06"></label>
+          <label>分類<select id="expenseCategory"><option>餐飲</option><option>交通</option><option>購物</option><option>門票／娛樂</option><option>住宿</option><option>其他</option></select></label>
+          <label class="wide">項目／備註<input type="text" id="expenseName" placeholder="例如：拉麵、車票、伴手禮" maxlength="60" required></label>
+          <label>幣別<select id="expenseCurrency"><option value="JPY">日圓（¥）</option><option value="TWD">台幣（NT$）</option></select></label>
+          <label><span id="expenseAmountLabel">金額（日圓）</span><input type="number" id="expenseAmount" min="1" step="1" placeholder="例如：1200" required></label>
+          <label>付款方式<select id="expensePayment"><option value="現金">現金</option><option value="信用卡">信用卡</option><option value="PayPay">PayPay</option></select></label>
+          <label>付款人（選填）<input type="text" id="expensePayer" placeholder="例如：我" maxlength="20"></label>
+          <label class="wide">付款備註（選填）<input type="text" id="expensePaymentNote" placeholder="例如：小美已付、阿明未付" maxlength="120"></label>
+          <button class="wide" type="submit">＋ 新增支出</button>
+        </form>
+      </div>
+      <div class="panel-card">
+        <h3 style="margin:0 0 8px;font-size:1rem">支出明細</h3>
+        <div style="overflow-x:auto"><table class="expense-table"><thead><tr><th>日期／項目</th><th>分類</th><th>付款方式</th><th>付款備註</th><th style="text-align:right">金額</th><th></th></tr></thead><tbody id="expenseRows"></tbody></table></div>
+        <div id="expenseEmpty" class="empty-state">目前還沒有記帳紀錄，新增第一筆旅費吧！</div>
+      </div>
+    </section>
+
+    <section id="shoppingPanel" class="page-panel" role="tabpanel" aria-label="待購物清單">
+      <h2 class="section-heading">待購物清單</h2>
+      <p class="section-intro">先把想買的東西記下來，買到後勾選即可；清單會保存在裝置，並在連線時同步。</p>
+      <div class="panel-card">
+        <form id="shoppingForm" class="expense-form">
+          <label class="wide">想買的商品<input type="text" id="shoppingName" maxlength="100" placeholder="例如：吉伊卡哇周邊、藥妝、伴手禮" required></label>
+          <label>分類<select id="shoppingCategory" class="shopping-form-select"></select></label>
+          <label>備註／店家（選填）<input type="text" id="shoppingMemo" maxlength="100" placeholder="例如：原宿店、幫朋友代買"></label>
+          <label>商品圖片（選填）<input type="file" id="shoppingImage" accept="image/*"><span class="shopping-upload-hint">可上傳商品照片或截圖，會自動縮小後儲存</span></label>
+          <button type="submit">＋ 加入清單</button>
+        </form>
+      </div>
+      <div class="panel-card">
+        <form id="shoppingCategoryForm" class="shopping-category-form">
+          <label>新增自己的分類<input id="shoppingNewCategory" type="text" maxlength="30" placeholder="例如：文具、動漫周邊"></label>
+          <button type="submit">＋ 新增分類</button>
+        </form>
+        <div class="progress-meta"><span>購物進度</span><strong id="shoppingCount">0 / 0 已完成</strong></div>
+        <div id="shoppingList" class="shopping-list"></div>
+        <div id="shoppingEmpty" class="empty-state">還沒有購物項目，先把想買的東西加進來吧！</div>
+      </div>
+    </section>
+
+    <footer class="footer">Made with ✦ for <strong>東京之旅</strong> ｜ 行程、打包、記帳與購物清單支援雲端同步<br>航班、營業時間與交通班次請以官方最新資訊為準。</footer>
+  </main>
+  <script>
+    // Main pages: itinerary, packing list, and expenses.
+    const pageTabs = [...document.querySelectorAll('.page-tab')];
+    const itineraryPanel = document.getElementById('itineraryPanel');
+    const packingPanel = document.getElementById('packingPanel');
+    const expensesPanel = document.getElementById('expensesPanel');
+    const shoppingPanel = document.getElementById('shoppingPanel');
+    function showPage(page) {
+      pageTabs.forEach(tab => tab.setAttribute('aria-selected', String(tab.dataset.page === page)));
+      itineraryPanel.classList.toggle('active', page === 'itinerary');
+      packingPanel.classList.toggle('active', page === 'packing');
+      expensesPanel.classList.toggle('active', page === 'expenses');
+      shoppingPanel.classList.toggle('active', page === 'shopping');
+      window.scrollTo({top: document.querySelector('.page-nav').offsetTop - 10, behavior:'smooth'});
+    }
+    pageTabs.forEach(tab => tab.addEventListener('click', () => showPage(tab.dataset.page)));
+
+    // Date subtabs inside the itinerary page.
+    const dayTabs = [...document.querySelectorAll('.day-picker button')];
+    const daySections = [...document.querySelectorAll('details.day[data-day-page]')];
+    function showDay(dayNo) {
+      dayTabs.forEach(tab => {
+        const selected = tab.dataset.day === String(dayNo);
+        tab.classList.toggle('active', selected);
+        tab.setAttribute('aria-pressed', String(selected));
+      });
+      daySections.forEach(section => { section.hidden = section.dataset.dayPage !== String(dayNo); });
+    }
+    dayTabs.forEach(tab => tab.addEventListener('click', () => showDay(tab.dataset.day)));
+    showDay(1);
+
+    // Each itinerary stop has separate transportation and note fields, saved locally.
+    const itineraryFieldsKey = 'tokyoTrip2026ItineraryFields';
+    let itineraryFields = {};
+    try { itineraryFields = JSON.parse(localStorage.getItem(itineraryFieldsKey) || '{}'); if (!itineraryFields || typeof itineraryFields !== 'object') itineraryFields = {}; }
+    catch (e) { itineraryFields = {}; }
+    document.querySelectorAll('details.day').forEach(day => {
+      const dayNo = day.dataset.dayPage;
+      day.querySelectorAll('.item').forEach((item, itemIndex) => {
+        const key = `${dayNo}-${itemIndex}`;
+        const fields = itineraryFields[key] || {};
+        const transportWrap = document.createElement('div'); transportWrap.className = 'itinerary-field';
+        const transportLabel = document.createElement('label'); transportLabel.textContent = '交通方式'; transportLabel.htmlFor = `transport-${key}`;
+        const transportInput = document.createElement('input'); transportInput.id = `transport-${key}`; transportInput.type = 'text';
+        transportInput.placeholder = '例如：JR 山手線／步行 10 分鐘／搭乘計程車'; transportInput.value = fields.transport || '';
+        transportInput.addEventListener('input', () => { itineraryFields[key] = {...(itineraryFields[key] || {}), transport:transportInput.value}; saveLocal(itineraryFieldsKey, JSON.stringify(itineraryFields)); });
+        transportWrap.append(transportLabel, transportInput); item.appendChild(transportWrap);
+
+        const noteWrap = document.createElement('div'); noteWrap.className = 'itinerary-field';
+        const noteLabel = document.createElement('label'); noteLabel.textContent = '我的備註'; noteLabel.htmlFor = `note-${key}`;
+        const noteArea = document.createElement('textarea'); noteArea.id = `note-${key}`; noteArea.placeholder = '可填寫預約資訊、提醒或其他備註…'; noteArea.rows = 2; noteArea.value = fields.note || '';
+        noteArea.addEventListener('input', () => { itineraryFields[key] = {...(itineraryFields[key] || {}), note:noteArea.value}; saveLocal(itineraryFieldsKey, JSON.stringify(itineraryFields)); });
+        noteWrap.append(noteLabel, noteArea); item.appendChild(noteWrap);
+      });
+    });
+
+    // Packing list: default items can be renamed, and custom items can be added/edited/deleted.
+    const packingData = [
+      { title:'重要證件與金錢', items:['護照','身分證／健保卡','機票與住宿資料','日幣現金','信用卡／金融卡','交通票券／預約資料'] },
+      { title:'3C 與電子用品', items:['手機','手機充電器','行動電源','充電線','轉接頭','耳機','相機／記憶卡'] },
+      { title:'衣物與個人用品', items:['上衣與褲子','內衣褲／襪子','睡衣','外套／保暖衣物','舒適好走的鞋','盥洗用品','保養品／化妝品'] },
+      { title:'隨身包與其他', items:['隨身小包','雨傘／折疊傘','口罩','衛生紙／濕紙巾','常備藥品','環保購物袋／摺疊袋','行李秤'] }
+    ];
+    const packingKey = 'tokyoTrip2026Packing';
+    const packingNamesKey = 'tokyoTrip2026PackingNames';
+    const customPackingKey = 'tokyoTrip2026CustomPacking';
+    let packed = {}, packingNames = {}, customPacking = [];
+    try { packed = JSON.parse(localStorage.getItem(packingKey) || '{}') || {}; } catch(e) { packed = {}; }
+    try { packingNames = JSON.parse(localStorage.getItem(packingNamesKey) || '{}') || {}; } catch(e) { packingNames = {}; }
+    try { customPacking = JSON.parse(localStorage.getItem(customPackingKey) || '[]'); if (!Array.isArray(customPacking)) customPacking = []; } catch(e) { customPacking = []; }
+    // 舊版自訂物品沒有分類，先歸入「隨身包與其他」，之後新增可自行選分類。
+    customPacking.forEach(item => { if (item.category === undefined || item.category === null) item.category = 3; });
+    const packingGroups = document.getElementById('packingGroups');
+    function savePackingState() {
+      saveLocal(packingKey, JSON.stringify(packed));
+      saveLocal(packingNamesKey, JSON.stringify(packingNames));
+      saveLocal(customPackingKey, JSON.stringify(customPacking));
+    }
+    function makePackingItem(id, originalName, isCustom=false) {
+      const name = isCustom ? originalName : (packingNames[id] || originalName);
+      const label = document.createElement('div');
+      label.className = 'packing-item' + (packed[id] ? ' checked' : '');
+      const input = document.createElement('input'); input.type = 'checkbox'; input.checked = !!packed[id];
+      input.setAttribute('aria-label', '完成：' + name);
+      const span = document.createElement('span'); span.className = 'packing-name'; span.textContent = name;
+      input.addEventListener('change', () => { packed[id] = input.checked; label.classList.toggle('checked', input.checked); savePackingState(); updatePackingProgress(); });
+      const actions = document.createElement('div'); actions.className = 'packing-actions';
+      const edit = document.createElement('button'); edit.type = 'button'; edit.textContent = '修改'; edit.setAttribute('aria-label','修改物品：'+name);
+      edit.addEventListener('click', () => {
+        const next = window.prompt('修改物品名稱', span.textContent);
+        if (next === null) return;
+        const clean = next.trim(); if (!clean) { window.alert('物品名稱不能空白喔！'); return; }
+        span.textContent = clean;
+        if (isCustom) { const item = customPacking.find(x => x.id === id); if (item) item.name = clean; }
+        else packingNames[id] = clean;
+        savePackingState(); updatePackingProgress();
+      });
+      actions.appendChild(edit);
+      if (isCustom) {
+        const del = document.createElement('button'); del.type = 'button'; del.textContent = '刪除';
+        del.addEventListener('click', () => { customPacking = customPacking.filter(x => x.id !== id); delete packed[id]; savePackingState(); renderPacking(); });
+        actions.appendChild(del);
+      }
+      label.append(input, span, actions);
+      return label;
+    }
+    function renderPacking() {
+      packingGroups.replaceChildren();
+      packingData.forEach((group, gi) => {
+        const section = document.createElement('section'); section.className = 'packing-group';
+        const heading = document.createElement('h3'); heading.textContent = group.title; section.appendChild(heading);
+        const list = document.createElement('div'); list.className = 'packing-list';
+        group.items.forEach((item, ii) => list.appendChild(makePackingItem(`${gi}-${ii}`, item)));
+        customPacking.filter(item => Number(item.category) === gi).forEach(item => list.appendChild(makePackingItem(item.id, item.name, true)));
+        section.appendChild(list); packingGroups.appendChild(section);
+      });
+      updatePackingProgress();
+    }
+    function updatePackingProgress() {
+      const defaultTotal = packingData.reduce((sum, group) => sum + group.items.length, 0);
+      const total = defaultTotal + customPacking.length;
+      const done = Object.values(packed).filter(Boolean).length;
+      document.getElementById('packingCount').textContent = `${done} / ${total} 已完成`;
+      document.getElementById('packingProgress').style.width = `${total ? Math.min(done,total)/total*100 : 0}%`;
+    }
+    document.getElementById('packingAddForm').addEventListener('submit', event => {
+      event.preventDefault();
+      const input = document.getElementById('packingNewItem'); const name = input.value.trim();
+      if (!name) return;
+      customPacking.push({id:'custom-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), name, category:Number(document.getElementById('packingNewCategory').value)});
+      input.value = ''; savePackingState(); renderPacking(); input.focus();
+    });
+    renderPacking();
+
+    // Expense log: supports JPY/TWD and payment methods; old records default to JPY.
+    const expenseKey = 'tokyoTrip2026Expenses';
+    let expenses = [];
+    try { expenses = JSON.parse(localStorage.getItem(expenseKey) || '[]'); if (!Array.isArray(expenses)) expenses = []; } catch(e) { expenses = []; }
+    const yen = value => '¥' + Number(value).toLocaleString('ja-JP');
+    const twd = value => 'NT$' + Number(value).toLocaleString('zh-TW');
+    const currencySelect = document.getElementById('expenseCurrency');
+    const amountLabel = document.getElementById('expenseAmountLabel');
+    const amountInput = document.getElementById('expenseAmount');
+    currencySelect.addEventListener('change', () => {
+      const isTWD = currencySelect.value === 'TWD';
+      amountLabel.textContent = isTWD ? '金額（台幣）' : '金額（日圓）';
+      amountInput.placeholder = isTWD ? '例如：350' : '例如：1200';
+    });
+    function saveExpenses() { saveLocal(expenseKey, JSON.stringify(expenses)); renderExpenses(); }
+    function addEditField(form, labelText, control, wide=false) {
+      const label = document.createElement('label');
+      if (wide) label.className = 'wide';
+      label.textContent = labelText; label.appendChild(control); form.appendChild(label);
+      return control;
+    }
+    function makeEditInput(value, type='text') {
+      const input = document.createElement('input'); input.type = type; input.value = value ?? ''; return input;
+    }
+    function makeEditSelect(options, value) {
+      const select = document.createElement('select');
+      options.forEach(option => { const opt=document.createElement('option'); opt.value=option; opt.textContent=option; select.appendChild(opt); });
+      select.value=value; return select;
+    }
+    function openExpenseEditor(item, currentRow) {
+      const editRow = document.createElement('tr');
+      const cell = document.createElement('td'); cell.colSpan = 6;
+      const form = document.createElement('form'); form.className = 'expense-edit-form';
+      const date = addEditField(form,'日期',makeEditInput(item.date,'date'));
+      const category = addEditField(form,'分類',makeEditSelect(['餐飲','交通','購物','門票／娛樂','住宿','其他'],item.category || '其他'));
+      const name = addEditField(form,'項目／備註',makeEditInput(item.name),true);
+      const currency = addEditField(form,'幣別',makeEditSelect(['JPY','TWD'],item.currency || 'JPY'));
+      const amount = addEditField(form,'金額',makeEditInput(item.amount,'number'));
+      amount.min='1'; amount.step='1';
+      const payment = addEditField(form,'付款方式',makeEditSelect(['現金','信用卡','PayPay'],item.payment || '現金'));
+      const payer = addEditField(form,'付款人',makeEditInput(item.payer || ''));
+      const paymentNote = addEditField(form,'付款備註',makeEditInput(item.paymentNote || ''),true);
+      const actions = document.createElement('div'); actions.className='expense-edit-actions';
+      const save = document.createElement('button'); save.type='submit'; save.textContent='儲存修改';
+      const cancel = document.createElement('button'); cancel.type='button'; cancel.textContent='取消'; cancel.addEventListener('click',renderExpenses);
+      actions.append(save,cancel); form.appendChild(actions);
+      form.addEventListener('submit',event=>{
+        event.preventDefault();
+        const numeric=Number(amount.value);
+        if (!name.value.trim() || !date.value || !Number.isFinite(numeric) || numeric<=0) { window.alert('請確認日期、項目與金額都已正確填寫。'); return; }
+        Object.assign(item,{date:date.value,category:category.value,name:name.value.trim(),currency:currency.value,amount:Math.round(numeric),payment:payment.value,payer:payer.value.trim(),paymentNote:paymentNote.value.trim()});
+        saveExpenses();
+      });
+      cell.appendChild(form); editRow.appendChild(cell); currentRow.replaceWith(editRow);
+    }
+    function renderExpenses() {
+      const tbody = document.getElementById('expenseRows'); tbody.replaceChildren();
+      const totalJPY = expenses.filter(item => (item.currency || 'JPY') === 'JPY').reduce((sum, item) => sum + Number(item.amount || 0), 0);
+      const totalTWD = expenses.filter(item => item.currency === 'TWD').reduce((sum, item) => sum + Number(item.amount || 0), 0);
+      document.getElementById('totalJPY').textContent = yen(totalJPY);
+      document.getElementById('totalTWD').textContent = twd(totalTWD);
+      document.getElementById('expenseCount').textContent = expenses.length + ' 筆';
+      document.getElementById('expenseEmpty').style.display = expenses.length ? 'none' : 'block';
+      [...expenses].sort((a,b) => b.date.localeCompare(a.date)).forEach(item => {
+        const tr = document.createElement('tr');
+        const detail = document.createElement('td');
+        detail.textContent = item.date.slice(5).replace('-','/') + ' · ' + item.name + (item.payer ? '（'+item.payer+'）' : '');
+        const category = document.createElement('td'); category.textContent = item.category;
+        const payment = document.createElement('td'); payment.className='expense-payment'; payment.textContent = item.payment || '現金';
+        const paymentNote = document.createElement('td'); paymentNote.textContent = item.paymentNote || '—';
+        const amount = document.createElement('td'); amount.className = 'amount'; amount.textContent = (item.currency === 'TWD' ? twd(item.amount) : yen(item.amount));
+        const action = document.createElement('td');
+        const edit = document.createElement('button'); edit.type='button'; edit.className='delete-expense'; edit.textContent='修改'; edit.addEventListener('click',()=>openExpenseEditor(item,tr));
+        const del = document.createElement('button'); del.type = 'button'; del.className = 'delete-expense'; del.textContent = '刪除'; del.setAttribute('aria-label','刪除 '+item.name);
+        del.addEventListener('click', () => { expenses = expenses.filter(x => x.id !== item.id); saveExpenses(); });
+        action.append(edit,del); tr.append(detail,category,payment,paymentNote,amount,action); tbody.appendChild(tr);
+      });
+    }
+    document.getElementById('expenseForm').addEventListener('submit', event => {
+      event.preventDefault();
+      const name = document.getElementById('expenseName').value.trim();
+      const amount = Number(amountInput.value);
+      if (!name || !Number.isFinite(amount) || amount <= 0) return;
+      expenses.push({
+        id: (Date.now().toString(36) + Math.random().toString(36).slice(2,7)),
+        date: document.getElementById('expenseDate').value,
+        category: document.getElementById('expenseCategory').value,
+        name, amount: Math.round(amount), currency:currencySelect.value,
+        payment:document.getElementById('expensePayment').value,
+        payer: document.getElementById('expensePayer').value.trim(),
+        paymentNote: document.getElementById('expensePaymentNote').value.trim()
+      });
+      event.target.reset(); document.getElementById('expenseDate').value = '2026-12-06';
+      currencySelect.value='JPY'; currencySelect.dispatchEvent(new Event('change')); saveExpenses();
+    });
+    renderExpenses();
+
+    // Shopping checklist with built-in and user-defined categories.
+    const shoppingKey = 'tokyoTrip2026ShoppingList';
+    const shoppingCategoryKey = 'tokyoTrip2026ShoppingCategories';
+    const defaultShoppingCategories = ['藥妝','食物','咖啡豆','ONE PIECE BASE SHOP'];
+    let shoppingCategories = [...defaultShoppingCategories];
+    try {
+      const savedCategories = JSON.parse(localStorage.getItem(shoppingCategoryKey) || '[]');
+      if (Array.isArray(savedCategories)) savedCategories.forEach(c => { if (typeof c === 'string' && c.trim() && !shoppingCategories.includes(c.trim())) shoppingCategories.push(c.trim()); });
+    } catch(e) {}
+    let shoppingItems = [];
+    try { shoppingItems = JSON.parse(localStorage.getItem(shoppingKey) || '[]'); if (!Array.isArray(shoppingItems)) shoppingItems = []; } catch(e) { shoppingItems = []; }
+    shoppingItems.forEach(item => { delete item.payer; delete item.paymentNote; if (!item.category) item.category = '未分類'; });
+    const shoppingList = document.getElementById('shoppingList');
+    const shoppingCategorySelect = document.getElementById('shoppingCategory');
+    function saveShoppingCategories() { saveLocal(shoppingCategoryKey, JSON.stringify(shoppingCategories)); }
+    function renderShoppingCategoryOptions() {
+      const current = shoppingCategorySelect.value;
+      shoppingCategorySelect.replaceChildren();
+      const options = [...(shoppingItems.some(x => x.category === '未分類') ? ['未分類'] : []), ...shoppingCategories];
+      options.forEach(category => { const option = document.createElement('option'); option.value = category; option.textContent = category; shoppingCategorySelect.appendChild(option); });
+      if (options.includes(current)) shoppingCategorySelect.value = current;
+    }
+    function saveShopping() { saveLocal(shoppingKey, JSON.stringify(shoppingItems)); renderShopping(); }
+    function renderShopping() {
+      shoppingList.replaceChildren();
+      const done = shoppingItems.filter(x => x.done).length;
+      document.getElementById('shoppingCount').textContent = `${done} / ${shoppingItems.length} 已完成`;
+      document.getElementById('shoppingEmpty').style.display = shoppingItems.length ? 'none' : 'block';
+      renderShoppingCategoryOptions();
+      const orderedCategories = [...(shoppingItems.some(x => x.category === '未分類') ? ['未分類'] : []), ...shoppingCategories];
+      orderedCategories.forEach(category => {
+        const items = shoppingItems.filter(x => (x.category || '未分類') === category);
+        if (!items.length) return;
+        const heading = document.createElement('h3'); heading.className = 'shopping-category'; heading.textContent = category;
+        const count = document.createElement('span'); count.className = 'shopping-category-count'; count.textContent = `${items.length} 項`; heading.appendChild(count); shoppingList.appendChild(heading);
+        items.forEach(item => {
+          const row = document.createElement('div'); row.className = 'shopping-row' + (item.done ? ' done' : '');
+          const check = document.createElement('input'); check.type = 'checkbox'; check.checked = !!item.done; check.setAttribute('aria-label', '標記完成：' + item.name);
+          check.addEventListener('change', () => { item.done = check.checked; saveShopping(); });
+          const main = document.createElement('div'); main.className = 'shopping-row-main';
+          const name = document.createElement('div'); name.className = 'shopping-row-name'; name.textContent = item.name; main.appendChild(name);
+          if (item.memo) { const memo = document.createElement('div'); memo.className = 'shopping-row-memo'; memo.textContent = '備註／店家：' + item.memo; main.appendChild(memo); }
+          if (item.image) { const photo = document.createElement('img'); photo.className = 'shopping-photo'; photo.src = item.image; photo.alt = item.name + ' 商品圖片'; photo.addEventListener('click', () => window.open(item.image, '_blank')); main.appendChild(photo); }
+          const actions = document.createElement('div'); actions.className = 'shopping-photo-actions';
+          const changePhoto = document.createElement('button'); changePhoto.type = 'button'; changePhoto.textContent = item.image ? '更換圖片' : '新增圖片';
+          const photoInput = document.createElement('input'); photoInput.type = 'file'; photoInput.accept = 'image/*'; photoInput.hidden = true;
+          changePhoto.addEventListener('click', () => photoInput.click());
+          photoInput.addEventListener('change', async () => { const file = photoInput.files && photoInput.files[0]; if (!file) return; try { item.image = await compressShoppingImage(file); saveShopping(); } catch(e) { alert('圖片處理失敗，請換一張圖片再試一次。'); } });
+          actions.append(changePhoto, photoInput);
+          if (item.image) { const removePhoto = document.createElement('button'); removePhoto.type = 'button'; removePhoto.textContent = '移除圖片'; removePhoto.addEventListener('click', () => { delete item.image; saveShopping(); }); actions.appendChild(removePhoto); }
+          main.appendChild(actions);
+          const del = document.createElement('button'); del.type = 'button'; del.className = 'shopping-delete'; del.textContent = '刪除'; del.addEventListener('click', () => { shoppingItems = shoppingItems.filter(x => x.id !== item.id); saveShopping(); });
+          row.append(check, main, del); shoppingList.appendChild(row);
+        });
+      });
+    }
+    document.getElementById('shoppingCategoryForm').addEventListener('submit', event => {
+      event.preventDefault();
+      const input = document.getElementById('shoppingNewCategory');
+      const category = input.value.trim();
+      if (!category) return;
+      if (shoppingCategories.includes(category) || category === '未分類') { alert('這個分類已經存在囉！'); return; }
+      shoppingCategories.push(category); saveShoppingCategories(); input.value = ''; renderShoppingCategoryOptions(); shoppingCategorySelect.value = category;
+    });
+    function compressShoppingImage(file) {
+      return new Promise((resolve, reject) => {
+        if (!file.type.startsWith('image/')) { reject(new Error('not image')); return; }
+        const reader = new FileReader();
+        reader.onerror = reject;
+        reader.onload = () => {
+          const img = new Image(); img.onerror = reject;
+          img.onload = () => {
+            const maxSide = 900, scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+            const canvas = document.createElement('canvas'); canvas.width = Math.round(img.width * scale); canvas.height = Math.round(img.height * scale);
+            canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+            resolve(canvas.toDataURL('image/jpeg', 0.76));
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+    document.getElementById('shoppingForm').addEventListener('submit', async event => {
+      event.preventDefault();
+      const name = document.getElementById('shoppingName').value.trim();
+      const memo = document.getElementById('shoppingMemo').value.trim();
+      const imageFile = document.getElementById('shoppingImage').files[0];
+      if (!name) return;
+      let image = '';
+      if (imageFile) {
+        try { image = await compressShoppingImage(imageFile); }
+        catch(e) { alert('圖片處理失敗，請換一張圖片再試一次。'); return; }
+      }
+      shoppingItems.push({id:Date.now().toString(36) + Math.random().toString(36).slice(2,7), name, memo, image, category:shoppingCategorySelect.value || defaultShoppingCategories[0], done:false});
+      event.target.reset(); saveShopping();
+    });
+    renderShopping();
+
+    const syncURL = 'https://script.google.com/macros/s/AKfycbx6LKmPVECiiRxQ2nAhPu3iDJxxq29dPst3ktoOSyD2jEP-EPBT_5rqT6YUinYpK8aPeA/exec';
+    const syncKeys = [itineraryFieldsKey,packingKey,packingNamesKey,customPackingKey,expenseKey,shoppingKey,shoppingCategoryKey];
+    const pendingKey = 'tokyoTrip2026SyncPending';
+    let pending = {};
+    try { pending = JSON.parse(localStorage.getItem(pendingKey)||'{}') || {}; } catch(e) {}
+    let ready=false, busy=false, timer;
+    const status = text => document.getElementById('syncStatus').textContent=text;
+    function saveLocal(key,value) {
+      localStorage.setItem(key,value);
+      pending[key]=value; localStorage.setItem(pendingKey,JSON.stringify(pending));
+      status('有變更，等待同步…'); clearTimeout(timer); timer=setTimeout(sync,1200);
+    }
+    function readCloud() {
+      return new Promise((resolve,reject)=>{
+        const cb='tripSync'+Date.now()+Math.random().toString(36).slice(2);
+        const script=document.createElement('script');
+        const cleanup=()=>{clearTimeout(timeout);script.remove();delete window[cb];};
+        const timeout=setTimeout(()=>{cleanup();reject(new Error('讀取逾時'));},20000);
+        window[cb]=data=>{cleanup();resolve(data);};
+        script.onerror=()=>{cleanup();reject(new Error('讀取失敗'));};
+        script.src=syncURL+'?callback='+cb+'&_='+Date.now();document.head.appendChild(script);
+      });
+    }
+    function applyCloud(data) {
+      let changed=false;
+      for(const key of syncKeys) {
+        if(Object.hasOwn(data,key) && !Object.hasOwn(pending,key)) {
+          const value=JSON.stringify(data[key]);
+          if(localStorage.getItem(key)!==value){localStorage.setItem(key,value);changed=true;}
+        }
+      }
+      if(changed) {
+        itineraryFields=JSON.parse(localStorage.getItem(itineraryFieldsKey)||'{}');
+        document.querySelectorAll('details.day').forEach(day=>day.querySelectorAll('.item').forEach((item,i)=>{const k=day.dataset.dayPage+'-'+i;const f=itineraryFields[k]||{};document.getElementById('transport-'+k).value=f.transport||'';document.getElementById('note-'+k).value=f.note||'';}));
+        packed=JSON.parse(localStorage.getItem(packingKey)||'{}');packingNames=JSON.parse(localStorage.getItem(packingNamesKey)||'{}');customPacking=JSON.parse(localStorage.getItem(customPackingKey)||'[]');customPacking.forEach(x=>{if(x.category==null)x.category=3;});renderPacking();
+        expenses=JSON.parse(localStorage.getItem(expenseKey)||'[]');renderExpenses();
+        shoppingItems=JSON.parse(localStorage.getItem(shoppingKey)||'[]');shoppingCategories=[...new Set([...defaultShoppingCategories,...JSON.parse(localStorage.getItem(shoppingCategoryKey)||'[]')])];renderShopping();
+      }
+    }
+    function comparable(key,value){if(key===shoppingKey && Array.isArray(value))return value.map(x=>{const y={...x};delete y.image;return y;});return value;}
+    async function sync(){
+      if(busy)return;busy=true;
+      try {
+        status('正在同步…');let remote=await readCloud();
+        if(!remote || !remote.data || typeof remote.initialized!=='boolean')throw new Error('雲端回應異常');
+        if(!ready && !remote.initialized){
+          status('雲端尚無資料，請在有原始資料的電腦按「立即同步」初始化。');return;
+        }
+        ready=true;
+        const sent={...pending};const keys=Object.keys(sent).filter(k=>syncKeys.includes(k));
+        if(keys.length){
+          const data=Object.fromEntries(keys.map(k=>[k,JSON.parse(sent[k])]));
+          await fetch(syncURL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=UTF-8'},body:JSON.stringify({data})});
+          remote=await readCloud();
+          for(const k of keys){
+            if(JSON.stringify(comparable(k,remote.data[k]))!==JSON.stringify(comparable(k,data[k])))throw new Error('雲端尚未確認寫入');
+            if(k===shoppingKey && data[k].some((x,i)=>x.image && !remote.data[k][i]?.image))throw new Error('圖片尚未確認');
+            if(pending[k]===sent[k])delete pending[k];
+          }
+          localStorage.setItem(pendingKey,JSON.stringify(pending));
+        }
+        applyCloud(remote.data);status(Object.keys(pending).length?'有變更，等待同步…':'雲端已同步');
+      }catch(e){status('同步未確認，資料仍保存在此裝置。請稍後重試。');console.warn(e);}finally{busy=false;}
+    }
+    document.getElementById('syncNow').addEventListener('click',async()=>{
+      if(busy)return;
+      try{busy=true;const remote=await readCloud();if(!remote.initialized){if(!confirm('將這台裝置的資料作為第一份雲端資料？請確認這是有完整資料的裝置。'))return;for(const k of syncKeys){const v=localStorage.getItem(k);if(v!==null)pending[k]=v;}if(!Object.keys(pending).length){status('此裝置沒有可上傳的資料。');return;}localStorage.setItem(pendingKey,JSON.stringify(pending));}ready=true;}catch(e){status('無法連接雲端，請稍後重試。');return;}finally{busy=false;}sync();
+    });
+    sync();setInterval(()=>{if(!document.hidden && ready && !document.activeElement?.matches('input,textarea,select') && !document.querySelector('.expense-edit-form'))sync();},15000);
+    document.addEventListener('visibilitychange',()=>{if(!document.hidden && ready)sync();});
+
+  </script>
+</body>
+</html>
